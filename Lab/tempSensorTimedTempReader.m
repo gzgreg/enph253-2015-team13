@@ -27,3 +27,13 @@ while ~digitalRead(a, digiPin)
     pause(0.01);
 end
 hold off;
+
+%{
+description of readings:
+First dimension is stats for an individual reading. 1 is reading value, 2
+is reading standard deviation, 3 is reading time.
+Second dimension is the particular temp sensor. 1-5 are sensors from
+closest to farthest from power resistor: 6 is ambient temp.
+Third dimension is a particular reading set taken within one loop run
+above.
+%}

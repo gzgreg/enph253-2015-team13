@@ -5,8 +5,11 @@
 #define I_PIN 7
 #define LEFT_SENSOR 0
 #define RIGHT_SENSOR 1
+#define LEFT_MOTOR 0
+#define RIGHT_MOTOR 1
 #define LINE_THRESHOLD 30
 #define ERR_LIMIT 10
+#define MAX_SPEED 700
 
 int P, I, D, errInt, errDeriv, prevErr;
 
@@ -39,4 +42,13 @@ void loop()
   if(errInt > ERR_LIMIT) errInt = ERR_LIMIT;
   if(errInt < -ERR_LIMIT) errInt = -ERR_LIMIT;  
   int correct = P*totalErr + I*errInt + D*errDeriv;
+  
+  int leftMotor, rightMotor;
+  leftMotor = (correct > 0) ? MAX_SPEED : MAX_SPEED - correct;
+  rightMotor = (correct < 0) ? MAX_SPEED : MAX_SPEED - correct;
+  
+  analogWrite(LEFT_MOTOR, leftMotor);
+  analogWrite(RIGHT_MOTOR, rightMotor);
+  
+  prevErr = totalErr;
 }

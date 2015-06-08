@@ -15,4 +15,4 @@ plot(time,tmpAmb,time,tmpAmb);
 plot(time,tmp);
 
 %do a curve fit once we have the correct equations for the tmp sensor to
-%find out the heat loss rate of the calorimeter.
+%fi nd out the heat loss rate of the calorimeter.

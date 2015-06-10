@@ -1,54 +1,127 @@
-#include <phys253.h>          
-#include <LiquidCrystal.h>    
+#include <phys253.h>
+#include <LiquidCrystal.h>
 
-#define P_PIN 6
-#define I_PIN 7
+#define CONFIG_PIN 6
+#define CORRECT_PIN 7
 #define LEFT_SENSOR 0
 #define RIGHT_SENSOR 1
 #define LEFT_MOTOR 0
 #define RIGHT_MOTOR 1
-#define LINE_THRESHOLD 30
 #define ERR_LIMIT 10
-#define MAX_SPEED 700
+#define MAX_SPEED 255
 
-int P, I, D, errInt, errDeriv, prevErr;
+int P, I, D, G, errInt, errDeriv, prevErr, errTime, prevErrTime, threshold, i;
 
 void setup()
-{  
-  #include <phys253setup.txt>
+{
+#include <phys253setup.txt>
   Serial.begin(9600) ;
-  
-  errInt = 0;
-  prevErr = 0;
+
   D = 0;
+  I = 0;
+  G = 0;
+  P = 0;
+  runMenu();
 }
 
 void loop()
 {
-  int leftSensor = analogRead(LEFT_SENSOR);
-  int rightSensor = analogRead(RIGHT_SENSOR);
-  int leftErr = (leftSensor > LINE_THRESHOLD) ? 1 : 0;
-  int rightErr = (rightSensor > LINE_THRESHOLD) ? 1 : 0;
-  
-  int totalErr = leftErr - rightErr;
-  if(leftErr + rightErr > 0 && totalErr == 0){
-    //off line: set error to be same sign as previous error
-    if(prevErr < 0) totalErr = -2;
-    if(prevErr > 0) totalErr = 2;
+  if(startbutton()){
+    motor.speed(LEFT_MOTOR, 0);
+    motor.speed (RIGHT_MOTOR, 0);
+    runMenu();
   }
   
-  errDeriv = totalErr - prevErr;
+  int leftSensor = analogRead(LEFT_SENSOR);
+  int rightSensor = analogRead(RIGHT_SENSOR);
+  int leftErr = (leftSensor > threshold) ? 1 : 0;
+  int rightErr = (rightSensor > threshold) ? 1 : 0;
+
+  int totalErr = leftErr - rightErr;
+  if (leftErr + rightErr > 0 && totalErr == 0) {
+    //off line: set error to be same sign as previous error
+    if (prevErr < 0) totalErr = -5;
+    if (prevErr >= 0) totalErr = 5;
+  }
+
+  if (totalErr != prevErr) {
+    errTime = 0;
+    prevErrTime = errTime; //take slope from change before previous change
+  }
+
+  errDeriv = (totalErr - prevErr) / (errTime + prevErrTime);
   errInt = errInt + totalErr;
-  if(errInt > ERR_LIMIT) errInt = ERR_LIMIT;
-  if(errInt < -ERR_LIMIT) errInt = -ERR_LIMIT;  
-  int correct = P*totalErr + I*errInt + D*errDeriv;
-  
+  if (errInt > ERR_LIMIT) errInt = ERR_LIMIT;
+  if (errInt < -ERR_LIMIT) errInt = -ERR_LIMIT;
+  int correct = G*(P * totalErr + I * errInt + D * errDeriv);
+
   int leftMotor, rightMotor;
   leftMotor = (correct > 0) ? MAX_SPEED : MAX_SPEED - correct;
-  rightMotor = (correct < 0) ? MAX_SPEED : MAX_SPEED - correct;
+  rightMotor = (correct < 0) ? -MAX_SPEED : -MAX_SPEED + correct;
   
-  analogWrite(LEFT_MOTOR, leftMotor);
-  analogWrite(RIGHT_MOTOR, rightMotor);
+  motor.speed(LEFT_MOTOR, leftMotor);
+  motor.speed (RIGHT_MOTOR, rightMotor);
+  
+  if(i == 100){
+    LCD.clear();
+    LCD.home();
+    LCD.print(G + " " + P + " " + D + " ");
+    LCD.setCursor(0, 1);
+    LCD.print(correct);
+  }
   
   prevErr = totalErr;
+  errTime = errTime + 1;
+}
+
+void runMenu() {
+  LCD.clear();
+  LCD.home();
+  LCD.print("G: ");
+  
+  while(!startbutton()){
+    G = knob(CONFIG_PIN);
+    LCD.setCursor(3, 0);
+    LCD.print(G);
+    delay(50);
+  }
+  
+  LCD.clear();
+  LCD.home();
+  LCD.print("P: ");
+  
+  while(!startbutton()){
+    P = knob(CONFIG_PIN);
+    LCD.setCursor(3, 0);
+    LCD.print(P);
+    delay(50);
+  }
+  
+  LCD.clear();
+  LCD.home();
+  LCD.print("D: ");
+  
+  while(!startbutton()){
+    D = knob(CONFIG_PIN);
+    LCD.setCursor(3, 0);
+    LCD.print(D);
+    delay(50);
+  }
+  
+  LCD.clear();
+  LCD.home();
+  LCD.print("Thresh: ");
+  
+  while(!startbutton()){
+    threshold = knob(CONFIG_PIN);
+    LCD.setCursor(0, 1);
+    LCD.print(threshold);
+    delay(50);
+  }
+  
+  errInt = 0;
+  prevErr = 0;
+  errTime = 0;
+  prevErrTime = 0;
+  i = 100;
 }

@@ -1,14 +1,17 @@
+//Note that the 
+
 #include <phys253.h>
 #include <LiquidCrystal.h>
 
 #define CONFIG_PIN 6
 #define CORRECT_PIN 7
-#define LEFT_SENSOR 0
-#define RIGHT_SENSOR 1
+#define LEFT_SENSOR 2
+#define RIGHT_SENSOR 3
 #define LEFT_MOTOR 0
 #define RIGHT_MOTOR 1
 #define ERR_LIMIT 10
 #define MAX_SPEED 255
+#define BUTTON_WAIT 200
 
 int P, I, D, G, errInt, errDeriv, prevErr, errTime, prevErrTime, threshold, i;
 
@@ -65,60 +68,66 @@ void loop()
   if(i == 100){
     LCD.clear();
     LCD.home();
-    LCD.print(G + " " + P + " " + D + " ");
+    char buffer[1024];
+    sprintf(buffer, "%d %d %d", G, P, D);
+    LCD.print(buffer);
     LCD.setCursor(0, 1);
-    LCD.print(correct);
+    sprintf(buffer, "%d %d %d", correct, leftSensor, rightSensor);
+    LCD.print(buffer);
+    i = 0;
   }
   
   prevErr = totalErr;
   errTime = errTime + 1;
+  i = i + 1;
 }
 
 void runMenu() {
-  LCD.clear();
-  LCD.home();
-  LCD.print("G: ");
-  
+  delay(BUTTON_WAIT);
   while(!startbutton()){
+    LCD.clear();
+    LCD.home();
+    LCD.print("G: ");
     G = knob(CONFIG_PIN);
     LCD.setCursor(3, 0);
     LCD.print(G);
     delay(50);
   }
   
-  LCD.clear();
-  LCD.home();
-  LCD.print("P: ");
-  
+  delay(BUTTON_WAIT);
   while(!startbutton()){
+    LCD.clear();
+    LCD.home();
+    LCD.print("P: ");
     P = knob(CONFIG_PIN);
     LCD.setCursor(3, 0);
     LCD.print(P);
     delay(50);
   }
   
-  LCD.clear();
-  LCD.home();
-  LCD.print("D: ");
-  
+  delay(BUTTON_WAIT);
   while(!startbutton()){
+    LCD.clear();
+    LCD.home();
+    LCD.print("D: ");
     D = knob(CONFIG_PIN);
     LCD.setCursor(3, 0);
     LCD.print(D);
     delay(50);
   }
   
-  LCD.clear();
-  LCD.home();
-  LCD.print("Thresh: ");
-  
+  delay(BUTTON_WAIT);
   while(!startbutton()){
+    LCD.clear();
+    LCD.home();
+    LCD.print("Thresh: ");
     threshold = knob(CONFIG_PIN);
     LCD.setCursor(0, 1);
     LCD.print(threshold);
     delay(50);
   }
   
+  delay(BUTTON_WAIT);
   errInt = 0;
   prevErr = 0;
   errTime = 0;

@@ -35,6 +35,21 @@ void loop()
     runMenu();
   }
   
+  if(stopbutton()){
+    motor.speed(LEFT_MOTOR, 0);
+    motor.speed (RIGHT_MOTOR, 0);
+    delay(BUTTON_WAIT);
+    while(!stopbutton()){
+      int leftSensor = analogRead(LEFT_SENSOR);
+      int rightSensor = analogRead(RIGHT_SENSOR);
+      LCD.clear();
+      LCD.home();
+      LCD.print(leftSensor);
+      LCD.setCursor(0, 1);
+      LCD.print(rightSensor);
+    }
+  }
+  
   int leftSensor = analogRead(LEFT_SENSOR);
   int rightSensor = analogRead(RIGHT_SENSOR);
   int leftErr = (leftSensor > threshold) ? 1 : 0;

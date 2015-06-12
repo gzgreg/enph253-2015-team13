@@ -5,25 +5,25 @@
 
 #define CONFIG_PIN 6
 #define CORRECT_PIN 7
-#define LEFT_SENSOR 2
-#define RIGHT_SENSOR 3
-#define LEFT_MOTOR 0
-#define RIGHT_MOTOR 1
+#define LEFT_SENSOR 0
+#define RIGHT_SENSOR 1
+#define LEFT_MOTOR 1
+#define RIGHT_MOTOR 0
 #define ERR_LIMIT 10
 #define MAX_SPEED 160
 #define BUTTON_WAIT 200
 
-int P, I, D, G, errInt, errDeriv, prevErr, errTime, prevErrTime, threshold, i;
+int P, I, D, G, errInt, errDeriv, prevErr, errTime, prevErrTime, threshold, i, flash;
 
 void setup()
 {
 #include <phys253setup.txt>
   Serial.begin(9600) ;
 
-  D = 0;
-  I = 0;
-  G = 0;
-  P = 0;
+  D = 69;
+  I = 69;
+  G = 69;
+  P = 69;
   runMenu();
 }
 
@@ -107,49 +107,60 @@ void loop()
   i = i + 1;
 }
 
+    
+
+
 void runMenu() {
-  delay(BUTTON_WAIT);
+  while(startbutton()){}//wait for button to be unpressed 
   while(!startbutton()){
     LCD.clear();
     LCD.home();
     LCD.print("G: ");
-    G = knob(CONFIG_PIN);
+    if(stopbutton()){
+     G = editVal("G: ");
+    }
     LCD.setCursor(3, 0);
     LCD.print(G);
-    delay(50);
+    delay(30);
   }
   
-  delay(BUTTON_WAIT);
+  while(startbutton()){}//wait for button to be unpressed 
   while(!startbutton()){
     LCD.clear();
     LCD.home();
     LCD.print("P: ");
-    P = knob(CONFIG_PIN);
+    if(stopbutton()){
+      P = editVal("P: ");
+    }
     LCD.setCursor(3, 0);
     LCD.print(P);
-    delay(50);
+    delay(30);
   }
   
-  delay(BUTTON_WAIT);
+  while(startbutton()){}//wait for button to be unpressed 
   while(!startbutton()){
     LCD.clear();
     LCD.home();
     LCD.print("D: ");
-    D = knob(CONFIG_PIN);
+    if(stopbutton()){
+      D = editVal("D: ");
+    }
     LCD.setCursor(3, 0);
     LCD.print(D);
-    delay(50);
+    delay(30);
   }
   
-  delay(BUTTON_WAIT);
+  while(startbutton()){}//wait for button to be unpressed 
   while(!startbutton()){
     LCD.clear();
     LCD.home();
     LCD.print("Thresh: ");
-    threshold = knob(CONFIG_PIN);
+    if(stopbutton()){
+      threshold = editVal("Thresh: ");
+    }
     LCD.setCursor(0, 1);
     LCD.print(threshold);
-    delay(50);
+    delay(30);
   }
   
   delay(BUTTON_WAIT);
@@ -158,4 +169,27 @@ void runMenu() {
   errTime = 0;
   prevErrTime = 0;
   i = 100;
+}
+
+int editVal(String val) {
+  while(stopbutton()){}
+  int flash = 0;
+  int knobVal;
+  while(!stopbutton()){
+    flash++;
+    knobVal = knob(CONFIG_PIN);
+    if(flash%10>5){
+      LCD.clear();
+      }
+    else{
+      LCD.home();
+      LCD.print(val);
+      }          
+    LCD.setCursor(0, 1);
+    LCD.print(knobVal);
+    delay(30);
+  }
+  while(stopbutton()){}
+  return knobVal;
+  
 }

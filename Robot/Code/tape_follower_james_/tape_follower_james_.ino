@@ -13,17 +13,19 @@
 #define MAX_SPEED 50
 #define BUTTON_WAIT 200
 
-int P, I, D, G, errInt, errDeriv, prevErr, errTime, prevErrTime, threshold, i, flash;
+int P, I, D, G, errInt, errDeriv, prevErr, errTime, prevErrTime, threshold, i, maxSpeed;
 
 void setup()
 {
 #include <phys253setup.txt>
   Serial.begin(9600) ;
-
-  D = 69;
-  I = 69;
+  
+  maxSpeed = 100;
+  D = 0;
+  I = 0;
   G = 69;
   P = 69;
+  
   runMenu();
 }
 
@@ -39,8 +41,8 @@ void loop()
   
   int leftSensor = analogRead(LEFT_SENSOR);
   int rightSensor = analogRead(RIGHT_SENSOR);
-  int leftErr = (leftSensor > threshold) ? 1 : 0;
-  int rightErr = (rightSensor > threshold) ? 1 : 0;
+  int leftErr = (leftSensor < threshold) ? 1 : 0;
+  int rightErr = (rightSensor < threshold) ? 1 : 0;
 
   int totalErr = leftErr - rightErr;
   if (leftErr + rightErr > 0 && totalErr == 0) {
@@ -58,16 +60,21 @@ void loop()
   errInt = errInt + totalErr;
   if (errInt > ERR_LIMIT) errInt = ERR_LIMIT;
   if (errInt < -ERR_LIMIT) errInt = -ERR_LIMIT;
-  int correct = G*(P * totalErr + I * errInt + D * errDeriv);
-
+  int correct = (G/10.0)*(P * totalErr + I * errInt + D * errDeriv);
+  if(correct > 2*maxSpeed){
+    correct = 2*maxSpeed;
+  }
+  else if(correct < -2*maxSpeed){
+    correct = -2*maxSpeed;
+  }
   int leftMotor, rightMotor;
-  leftMotor = (correct > 0) ? MAX_SPEED : MAX_SPEED + correct;
-  rightMotor = (correct < 0) ? -MAX_SPEED : -MAX_SPEED + correct;
+  leftMotor = (correct > 0) ? maxSpeed : maxSpeed + correct;
+  rightMotor = (correct < 0) ? -maxSpeed : -maxSpeed + correct;
   
   motor.speed(LEFT_MOTOR, leftMotor);
   motor.speed (RIGHT_MOTOR, rightMotor);
   
-  if(i == 100){
+  if(i == 200){
     LCD.clear();
     LCD.home();
     char buffer[1024];
@@ -88,6 +95,20 @@ void loop()
 
 
 void runMenu() {
+  
+  
+  while(!startbutton()){
+    LCD.clear();
+    LCD.home();
+    LCD.print("Speed: ");
+    if(stopbutton()){
+     maxSpeed = editVal("Speed: ");
+    }
+    LCD.setCursor(0, 1);
+    LCD.print(maxSpeed);
+    delay(30);
+  }
+  
   while(startbutton()){}//wait for button to be unpressed 
   while(!startbutton()){
     LCD.clear();
@@ -96,7 +117,7 @@ void runMenu() {
     if(stopbutton()){
      G = editVal("G: ");
     }
-    LCD.setCursor(3, 0);
+    LCD.setCursor(0, 1);
     LCD.print(G);
     delay(30);
   }
@@ -109,7 +130,7 @@ void runMenu() {
     if(stopbutton()){
       P = editVal("P: ");
     }
-    LCD.setCursor(3, 0);
+    LCD.setCursor(0, 1);
     LCD.print(P);
     delay(30);
   }
@@ -122,7 +143,7 @@ void runMenu() {
     if(stopbutton()){
       D = editVal("D: ");
     }
-    LCD.setCursor(3, 0);
+    LCD.setCursor(0, 1);
     LCD.print(D);
     delay(30);
   }
@@ -162,7 +183,7 @@ int editVal(String val) {
       LCD.home();
       LCD.print(val);
       }          
-    LCD.setCursor(0, 1);
+    LCD.setCursor(0, 1);v 
     LCD.print(knobVal);
     delay(30);
   }

@@ -10,7 +10,7 @@
 #define LEFT_MOTOR 0
 #define RIGHT_MOTOR 1
 #define ERR_LIMIT 10
-#define MAX_SPEED 255
+#define MAX_SPEED 160
 #define BUTTON_WAIT 200
 
 int P, I, D, G, errInt, errDeriv, prevErr, errTime, prevErrTime, threshold, i;
@@ -28,38 +28,15 @@ void setup()
 }
 
 void loop()
-{
-  if(startbutton()){
-    motor.speed(LEFT_MOTOR, 0);
-    motor.speed (RIGHT_MOTOR, 0);
-    runMenu();
-  }
-  
-  if(stopbutton()){
-    motor.speed(LEFT_MOTOR, 0);
-    motor.speed (RIGHT_MOTOR, 0);
-    delay(BUTTON_WAIT);
-    while(!stopbutton()){
-      int leftSensor = analogRead(LEFT_SENSOR);
-      int rightSensor = analogRead(RIGHT_SENSOR);
-      LCD.clear();
-      LCD.home();
-      LCD.print(leftSensor);
-      LCD.setCursor(0, 1);
-      LCD.print(rightSensor);
-    }
-  }
-  
-  int leftSensor = analogRead(LEFT_SENSOR);
-  int rightSensor = analogRead(RIGHT_SENSOR);
-  int leftErr = (leftSensor > threshold) ? 1 : 0;
-  int rightErr = (rightSensor > threshold) ? 1 : 0;
+{  
+  int leftErr = (analogRead(LEFT_SENSOR) < threshold) ? 1 : 0;
+  int rightErr = (analogRead(RIGHT_SENSOR) < threshold) ? 1 : 0;
 
   int totalErr = leftErr - rightErr;
-  if (leftErr + rightErr > 0 && totalErr == 0) {
+  if (leftErr == 1 && rightErr == 1) {
     //off line: set error to be same sign as previous error
-    if (prevErr < 0) totalErr = -5;
-    if (prevErr >= 0) totalErr = 5;
+    if (prevErr < 0) totalErr = -3;
+    if (prevErr >= 0) totalErr = 3;
   }
 
   if (totalErr != prevErr) {
@@ -72,22 +49,55 @@ void loop()
   if (errInt > ERR_LIMIT) errInt = ERR_LIMIT;
   if (errInt < -ERR_LIMIT) errInt = -ERR_LIMIT;
   int correct = G*(P * totalErr + I * errInt + D * errDeriv);
-
+  if(correct > MAX_SPEED * 2) correct = 511;
+  if(correct < -MAX_SPEED * 2) correct = -511;
+  
   int leftMotor, rightMotor;
-  leftMotor = (correct > 0) ? MAX_SPEED : MAX_SPEED - correct;
+  leftMotor = (correct > 0) ? MAX_SPEED : MAX_SPEED + correct;
   rightMotor = (correct < 0) ? -MAX_SPEED : -MAX_SPEED + correct;
   
   motor.speed(LEFT_MOTOR, leftMotor);
   motor.speed (RIGHT_MOTOR, rightMotor);
   
   if(i == 100){
+    if(startbutton()){
+      if(startbutton()){
+        if(startbutton()){
+          motor.speed(LEFT_MOTOR, 0);
+          motor.speed (RIGHT_MOTOR, 0);
+          runMenu();
+        }
+      }
+    }
+    
+    if(stopbutton()){
+      if(stopbutton()){
+        if(stopbutton()){
+          motor.speed(LEFT_MOTOR, 0);
+          motor.speed (RIGHT_MOTOR, 0);
+          delay(BUTTON_WAIT);
+          while(!stopbutton()){
+            int leftSensor = analogRead(LEFT_SENSOR);
+            int rightSensor = analogRead(RIGHT_SENSOR);
+            LCD.clear();
+            LCD.home();
+            LCD.print(leftSensor);
+            LCD.setCursor(0, 1);
+            LCD.print(rightSensor);
+            delay(50);
+          }  
+        }
+      }
+      delay(BUTTON_WAIT);
+    }
+    
     LCD.clear();
     LCD.home();
     char buffer[1024];
     sprintf(buffer, "%d %d %d", G, P, D);
     LCD.print(buffer);
     LCD.setCursor(0, 1);
-    sprintf(buffer, "%d %d %d", correct, leftSensor, rightSensor);
+    sprintf(buffer, "%d %d %d", correct, leftMotor, rightMotor);
     LCD.print(buffer);
     i = 0;
   }

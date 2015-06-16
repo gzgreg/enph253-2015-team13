@@ -1,0 +1,18 @@
+T2 = 0.8513*T1 - 3.774: R-Square = 0.9996
+T3 = 0.9027*T1 - 2.005: R-Square = 0.9996
+T4 = 0.7815*T1 + 7.485: R-Square = 0.9894
+
+(all of these are from curve fitting T1, squeeze(readings(1, 2, :)), against other sensor results, using LAR robust algorithm)
+
+Assuming T1 goes from 0 to 100:
+
+T1(0) = mean(squeeze(readings(1, 2, 1500:1575))) = 13.9605
+T1(100) = mean(squeeze(readings(1, 2, 2390:2426))) = 174.1568
+
+T1 = 16.02*T + 13.9605
+
+T2 = 13.64*T + 8.11
+
+T3 = 14.46*T + 10.60
+
+T4 = 12.52*T + 18.40

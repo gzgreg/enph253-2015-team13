@@ -1,18 +1,20 @@
-T2 = 0.8513*T1 - 3.774: R-Square = 0.9996
-T3 = 0.9027*T1 - 2.005: R-Square = 0.9996
-T4 = 0.7815*T1 + 7.485: R-Square = 0.9894
+T2 = 1.011*T1 - 1.937: R-Square = 0.9989
+T3 = 0.8523*T1 - 3.371: R-Square = 0.9964
+T4 = 0.8173*T1 + 0.2576: R-Square = 0.9928
+T5 = 1.151*T1 - 5.114: R-Square = 0.9989
 
-(all of these are from curve fitting T1, squeeze(readings(1, 2, :)), against other sensor results, using LAR robust algorithm)
+(all of these are from curve fitting T1, squeeze(readings(1, 1, :)), against other sensor results)
 
-Assuming T1 goes from 5 to 95: (based on thermometer readings
+Using logistic estimation of asymptotes for T2: (custom equation of form b/(1+exp(-k*(x-a))) + c)
+T2(20) = 38.5
+T2(100) = 183.5
 
-T1(5) = mean(squeeze(readings(1, 2, 1500:1575))) = 13.9605
-T1(95) = mean(squeeze(readings(1, 2, 2390:2426))) = 174.1568
+T1 = 1.79*T + 4.14
 
-T1 = 1.78*T + 5.061
+T2 = 1.81*T + 2.25
 
-T2 = 1.52*T + 0.53
+T3 = 1.53*T + 0.16
 
-T3 = 1.61*T + 2.56
+T4 = 1.46*T + 3.64
 
-T4 = 1.3911*T + 11.44
+T5 = 2.06*T - 0.35

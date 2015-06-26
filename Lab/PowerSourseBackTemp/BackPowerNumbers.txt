@@ -1,0 +1,9 @@
+Using a curve fit a*exp(-b*x)+c for squeeze(readings(3, 2, :)) against squeeze(readings(1, 2, :)):
+
+The c-value is  66.53  (66.41, 66.66): using the fact that the sensor used is about 500*1024 (to an error of about 10%):
+
+T-back = 32.4854 C
+
+T-ambient = mean(squeeze(readings(1, 1, :)))*500/1024 = 22.458 C
+
+Pout = convection+radiation = S*kc*(dT) + S*sigma*1*(T-back^4 - T-ambient^4)

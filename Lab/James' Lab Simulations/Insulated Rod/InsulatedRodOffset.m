@@ -1,6 +1,8 @@
-%2015.06.10
-%ENPH 257 Lab - Insulated rod simulation
 
+%% ENPH 257 Lab - Insulated rod simulation
+%2015.06.10
+
+%%
 clear;
 
 %Change to local directory if running this on your machine
@@ -17,7 +19,7 @@ end
 %legend('read1','read2','read3','read4','read5','read6');
 %title('Transient - unoffset');
 
-%--------------------------------------------------------------------------
+%%
 
 %figure
 for i = 1:6
@@ -27,7 +29,7 @@ end
 %legend('read1','read2','read3','read4','read5','read6');
 %title('Transient - offset');
 
-%--------------------------------------------------------------------------
+%%
 
 load('C:\Users\James\Documents\MATLAB\ENPH 257\Lab Simulations\Insulated Rod\June1SteadyStateInsulatedHeating.mat')
 
@@ -40,8 +42,7 @@ end
 %legend('read1','read2','read3','read4','read5','read6');
 %title('Steady State - unoffset');
 
-%--------------------------------------------------------------------------
-
+%%
 %figure
 for i = 1:6
    % plot(squeeze(readings(1,i,:)) + offset(i) ,'color',rand(1,3));     

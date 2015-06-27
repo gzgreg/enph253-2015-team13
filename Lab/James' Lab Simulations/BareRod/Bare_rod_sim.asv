@@ -74,8 +74,10 @@ T(1) = sensorDataC(5)+273;%K
 P_conv_end = kc * pi * radius^2 * (T(1) - Tamb);
 
 %%
-% $P_{conv} = k_c  (2 \pi r) dx (T(1)^4 - T_{amb}^4)$
+% $P_conv_an = k_{c} *(2*\pi*r)*dx*(T(1) - T_{amb})$
+% $P_rad_end = \sigma * \epsillion * \pi * r^2 *(T(1)^4 - T_{amb}^4)$
 P_conv_an = kc * 2 * pi * radius * dx * (T(1) - Tamb);%convection power loss for the annulus of the end of the rod
+
 P_rad_end = sigma * emsv * pi * radius^2 *(T(1)^4 - Tamb^4);
 P_rad_an = sigma * emsv_elec_tape * 2 * pi * radius * dx *(T(1)^4 - Tamb^4);
 

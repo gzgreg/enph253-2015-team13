@@ -3,16 +3,16 @@
 %Temp sensor calibration stuff
 factors = [1.79 1.81 1.53 1.46 2.06 2];
 offsets = [4.14 2.25 0.16 3.64 -0.35 0];
-colors = ['r' 'b' 'm' 'g' 'k' '- -'];
+colors = ['r' 'b' 'm' 'g' 'k' 'k'];
 
 eps = 0.1; %emissivity
 sigma = 5.670e-8; % W /^-2 K^-4
 kc = 20; %convection constant
-k = 205; %conduction constant
+k = 213.76; %conduction constant
 c = 910; %specific heat capacity
 rho = 2700; %kg/m^3
 
-Pin = 10; %input power from resistor
+Pin = 9.9; %input power from resistor
 L = 0.305; %length
 r = 0.0111; %radius
 A = pi*r^2;
@@ -23,7 +23,7 @@ nstepsT = 6000;
 
 time = 6000; %seconds
 
-nstepsX = 10;
+nstepsX = 22;
 
 dt = time / nstepsT;
 dx = L / nstepsX;
@@ -42,12 +42,12 @@ for i = 1:(nstepsT)
             S = dx*pi*r*2 + A;
             Pcond = 0;
             eps = 1;
-            kc = 10;
+            kc = 178;
         else
             S = dx*pi*r*2;
             Pcond = -k*A*(T(i, j) - T(i, j+1))/dx;
-            eps = 0.1;
-            kc = 6; %represents heat loss through insulation: actually probably conduction
+            eps = 0;
+            kc = 0; %represents heat loss through insulation: actually probably conduction
         end
         Pconv = -S * (T(i, j) - Tamb) * kc;
         Prad = -eps * S * sigma * ((T(i, j) + 273.15)^4 - (Tamb+273.15)^4);
@@ -58,6 +58,8 @@ for i = 1:(nstepsT)
 end
 plot((1:length(T(:, 1))) + 68, T(:, 1), 'c')
 hold on
+plot((1:length(T(:, 22))) + 68, T(:, 22), 'c')
+plot((-10:30)*200, interp1q((0:nstepsT)'*dt + 68, T(:, 1), (-10:30)'*200))
 for i=1:6
 plot(squeeze(readings(3, i, 220:4130)), (squeeze(readings(1, i, 220:4130)) - offsets(i)) / factors(i), colors(i))
 end

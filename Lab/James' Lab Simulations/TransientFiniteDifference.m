@@ -1,5 +1,10 @@
 %Finite difference calculations for aluminum rod transients
 
+%Temp sensor calibration stuff
+factors = [1.79 1.81 1.53 1.46 2.06 2];
+offsets = [4.14 2.25 0.16 3.64 -0.35 0];
+colors = ['r' 'b' 'm' 'g' 'k' '- -'];
+
 eps = 0.1; %emissivity
 sigma = 5.670e-8; % W /^-2 K^-4
 kc = 20; %convection constant
@@ -51,9 +56,9 @@ for i = 1:(nstepsT)
         T(i+1, j) = Ptot*dt/(c*m) + T(i, j);
     end
 end
-plot((1:length(T(:, 1))) + 68, T(:, 1))
+plot((1:length(T(:, 1))) + 68, T(:, 1), 'c')
+hold on
 for i=1:6
-hold on;
-plot(squeeze(readings(3, i, 220:4130)), (squeeze(readings(1, i, 220:4130)) + offset(i)) / 2)
+plot(squeeze(readings(3, i, 220:4130)), (squeeze(readings(1, i, 220:4130)) - offsets(i)) / factors(i), colors(i))
 end
 hold off;

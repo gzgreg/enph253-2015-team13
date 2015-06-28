@@ -8,7 +8,7 @@ colors = ['r' 'b' 'm' 'g' 'k' 'k'];
 eps = 0.1; %emissivity
 sigma = 5.670e-8; % W /^-2 K^-4
 kc = 20; %convection constant
-k = 213.76; %conduction constant
+k = 221; %conduction constant
 c = 910; %specific heat capacity
 rho = 2700; %kg/m^3
 
@@ -42,7 +42,7 @@ for i = 1:(nstepsT)
             S = dx*pi*r*2 + A;
             Pcond = 0;
             eps = 1;
-            kc = 178;
+            kc = 175;
         else
             S = dx*pi*r*2;
             Pcond = -k*A*(T(i, j) - T(i, j+1))/dx;
@@ -58,8 +58,10 @@ for i = 1:(nstepsT)
 end
 plot((1:length(T(:, 1))) + 68, T(:, 1), 'c')
 hold on
+plot((1:length(T(:, 14))) + 68, T(:, 14), 'c')
+plot((1:length(T(:, 8))) + 68, T(:, 8), 'c')
+plot((1:length(T(:, 10))) + 68, T(:,10), 'c')
 plot((1:length(T(:, 22))) + 68, T(:, 22), 'c')
-plot((-10:30)*200, interp1q((0:nstepsT)'*dt + 68, T(:, 1), (-10:30)'*200))
 for i=1:6
 plot(squeeze(readings(3, i, 220:4130)), (squeeze(readings(1, i, 220:4130)) - offsets(i)) / factors(i), colors(i))
 end

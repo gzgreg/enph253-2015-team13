@@ -1,0 +1,4 @@
+Conduction constant k = 221.2
+kc, epsilon inside tube = 0
+kc outside tube = 175
+epsilon outside tube = 1

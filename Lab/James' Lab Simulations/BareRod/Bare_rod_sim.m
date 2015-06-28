@@ -9,8 +9,6 @@ close all;
 %Load the results (note: change this directory to your local one)
 load('C:\Users\James\Desktop\Robot\enph253-2015-team13\Lab\Bare_rod_test_June3\June3TransientSteadyState');
 
-%load tmp sensor calibration file
-run offsetCalc.m;
 %%
 
 radius = 0.0111; %m
@@ -51,12 +49,11 @@ t5end = h5 + width_tape/2;
 
 %%
 
-readRang = 1:400;
-sensorData = 1:6;
+readRange = 1:400;
 sensorDataC = 1:6;
+calibratedData = Calibrate(readings(1,:,readRange));%calibrates data in readRange
 for i = 1:6
-    sensorData(i) = mean(readings(1,i,readRang)) + offset(i);%raw arduino input
-    sensorDataC(i) = tmpConvert(sensorData(i));%C
+    sensorDataC(i) = mean(calibratedData(i,:));%C, averages temperature at each sensor
 end
 
 sensorPos = [h1 h2 h3 h4 h5]; %from end hole

@@ -10,8 +10,8 @@ close all;
 load('C:\Users\Riley\Documents\GitHub\enph253-2015-team13\Lab\Moist Rod\June12MoistRodSteadyState.mat');
 
 %load tmp sensor calibration file
-run offsetCalc.m; %Apperently we are changing this........ fml
-%%
+%run
+offsetCalc.m
 
 radius = 0.0111; %m
 length = 0.305; %m
@@ -57,7 +57,7 @@ readRang = 1:400;
 sensorData = 1:6;
 sensorDataC = 1:6;
 for i = 1:6
-    sensorData(i) = mean(readings(1,i,readRang)) + offset(i);%raw arduino input
+    sensorData(i) = mean(readings(1,i,readRang)) + offset(i);
     sensorDataC(i) = tmpConvert(sensorData(i));%C
 end
 

@@ -1,0 +1,17 @@
+Calibration was done by placing the 5 temperature senesors in a bag  in a water bath and heating the bath to boiling. 
+The readings of the five sensors were then averaged and the average was converted to temperature using the equation
+given on the the data sheet. This gives the best estimate of the temperature of the water versus time. Each temperature
+sensor was then least-squares fit to the temperature curve in order to give invidual equations for converting each
+temperature sensor reading to the actual temperature.
+
+results:
+
+Temperature =   0.4737*tmp1 - 1.02   degrees C
+
+Temperature =   0.4525*tmp2 + .8524   degrees C
+
+Temperature =   0.5492*tmp3 + 1.111   degrees C
+
+Temperature =   0.5179*tmp4 + 2.053  degrees C
+
+Temperature =   0.4577*tmp5 - 2.049   degrees C

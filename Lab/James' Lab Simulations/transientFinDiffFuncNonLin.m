@@ -5,6 +5,7 @@ function F = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, read
     %Temp sensor calibration stuff
     factors = [1.79 1.81 1.53 1.46 2.06 2];
     offsets = [4.14 2.25 0.16 3.64 -0.35 0];
+    offsets2 = [0.3312 2.9439 0.75 3.3023 -1.0658 0];
     sensorPos = [1 7 9 12 19];
 
     sigma = 5.670e-8; % W /^-2 K^-4
@@ -16,9 +17,9 @@ function F = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, read
     A = pi*r^2;
 
     if(amb1)
-        Tamb = mean(squeeze(readings(1, 1, 1:500))) * 500 / 1024; %ambient temperature
+        Tamb = mean(squeeze(readings(1, 1, 1:180)))/2; %ambient temperature
     else
-        Tamb = mean(squeeze(readings(1, 6, 1:500))) * 500 / 1024;
+        Tamb = mean(squeeze(readings(1, 6, 1:180)))/2;
     end
 
     nstepsT = ceil(readings(3, 6, readingF));
@@ -69,9 +70,9 @@ function F = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, read
     for i = 1:5
         j = i;
         %if(i == 4); j = 3; elseif(i == 3); j=4; else j = i; end
-        F(j, :) = interp1((1:length(T(:, sensorPos(i))))+tOffset, T(:, sensorPos(i)), squeeze(readings(3, j, rng))) - (squeeze(readings(1, j, rng)) - offsets(i))/factors(i);
+        F(j, :) = interp1((1:length(T(:,sensorPos(i))))+tOffset, T(:,sensorPos(i)),squeeze(readings(3, j, rng)))-(squeeze(readings(1, j, rng))-offsets(j))/factors(j)-offsets2(j);
     end
-    
+    figure(1);
     p = plot(F');
     title(param);
     

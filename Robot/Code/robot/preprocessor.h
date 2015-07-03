@@ -14,14 +14,16 @@
 class MenuItem{
 public:
   String    Name;
-  uint16_t  Value;
+  int Value;
   uint16_t* EEPROMAddress;
+  int Max;
   static uint16_t MenuItemCount;
-  MenuItem(String name){
+  MenuItem(String name, int max){
     MenuItemCount++;
     EEPROMAddress = (uint16_t*)(2 * MenuItemCount);
     Name = name;
-    Value = eeprom_read_word(EEPROMAddress);
+    Value = (int) eeprom_read_word(EEPROMAddress);
+    Max = max;
   }
   void Save(){
     eeprom_write_word(EEPROMAddress, Value);
@@ -30,12 +32,12 @@ public:
  
 uint16_t MenuItem::MenuItemCount = 0;
 /* Add the menu items here */
-MenuItem Speed = MenuItem("Speed");
-MenuItem PTape = MenuItem("P-Tape");
-MenuItem DTape = MenuItem("D-Tape");
-MenuItem Thresh = MenuItem("Thresh-Tape");
-MenuItem PIR = MenuItem("P-IR");
-MenuItem DIR = MenuItem("D-IR");
+MenuItem Speed = MenuItem("Speed", 255);
+MenuItem PTape = MenuItem("P-Tape", 1023);
+MenuItem DTape = MenuItem("D-Tape", 1023);
+MenuItem Thresh = MenuItem("Thresh-Tape", 1023);
+MenuItem PIR = MenuItem("P-IR", 1023);
+MenuItem DIR = MenuItem("D-IR", 1023);
 MenuItem menuItems[] = {Speed, PTape, DTape, Thresh, PIR, DIR};
  
 void Menu(){
@@ -49,14 +51,14 @@ void Menu(){
     LCD.clear(); LCD.home();
     LCD.print(menuItems[menuIndex].Name); LCD.print(" "); LCD.print(menuItems[menuIndex].Value);
     LCD.setCursor(0, 1);
-    LCD.print("Set to "); LCD.print(knob(7)); LCD.print("?");
+    LCD.print("Set to "); LCD.print(map(knob(7), 0, 1024, 0, menuItems[menuIndex].Max + 1)); LCD.print("?");
     delay(100);
  
     /* Press start button to save the new value */
     if (startbutton()){
       delay(50);
       if (startbutton()){
-        menuItems[menuIndex].Value = knob(7);
+        menuItems[menuIndex].Value = map(knob(7), 0, 1024, 0, menuItems[menuIndex].Max + 1);
         menuItems[menuIndex].Save();
         delay(250);
       }

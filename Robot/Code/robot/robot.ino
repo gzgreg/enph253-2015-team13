@@ -11,7 +11,7 @@ void setup()
 }
 
 void loop()
-{  
+{   
   int leftErr = (analogRead(LEFT_SENSOR) < Thresh.Value) ? 1 : 0;
   int rightErr = (analogRead(RIGHT_SENSOR) < Thresh.Value) ? 1 : 0;
 
@@ -29,8 +29,8 @@ void loop()
 
   errDeriv = (totalErr - prevErr) / (errTime + prevErrTime);
   int correct = (PTape.Value * totalErr + DTape.Value * errDeriv);
-  if(correct > Speed.Value * 2) correct = 511;
-  if(correct < -Speed.Value * 2) correct = -511;
+  if(correct > Speed.Value * 2) correct = Speed.Value * 2;
+  if(correct < -Speed.Value * 2) correct = -Speed.Value * 2;
   
   int leftMotor, rightMotor;
   leftMotor = (correct > 0) ? Speed.Value : Speed.Value + correct;
@@ -72,7 +72,7 @@ void loop()
     LCD.clear();
     LCD.home();
     char buffer[1024];
-    sprintf(buffer, "%d %d %d", PTape.Value, DTape.Value);
+    sprintf(buffer, "%d %d %d", Speed.Value, PTape.Value, DTape.Value);
     LCD.print(buffer);
     LCD.setCursor(0, 1);
     sprintf(buffer, "%d %d %d", correct, leftMotor, rightMotor);

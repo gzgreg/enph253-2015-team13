@@ -69,9 +69,9 @@ function [F, T] = transientFinDiffFuncNonLin(param, readings, tOffset, reading1,
     end
     rng = reading1:readingF;
     for i = 1:5
-        j = i;
+        j = i+amb1;
         %if(i == 4); j = 3; elseif(i == 3); j=4; else j = i; end
-        F(j, :) = interp1((1:length(T(:,i)))+tOffset, T(:,sensorPos(i)),squeeze(readings(3, j, rng)))-(squeeze(readings(1, j, rng))-offsets(j))/factors(j)+offsets2(j);
+        F(j-amb1, :) = interp1((1:length(T(:,i)))+tOffset, T(:,sensorPos(i)),squeeze(readings(3, j, rng)))-(squeeze(readings(1, j, rng))-offsets(j))/factors(j)+offsets2(j);
     end
 
     p = plot(F');

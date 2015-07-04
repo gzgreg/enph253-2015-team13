@@ -1,3 +1,5 @@
+load('June10VertBareRodHeating-BottomPowered');
+
 lb = [0 0 0.3 0 0];
 ub = [Inf Inf 0.31 Inf 1];
 x = [200 100 0.1 0 0]; %initial guess

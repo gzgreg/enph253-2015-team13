@@ -7,7 +7,7 @@
 clear all;
 close all;
 %Load the results (note: change this directory to your local one)
-load('C:\Users\James\Desktop\Robot\enph253-2015-team13\Lab\Bare_rod_test_June3\June3TransientSteadyState');
+load('June3TransientSteadyState');
 
 %%
 

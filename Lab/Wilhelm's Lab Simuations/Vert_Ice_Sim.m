@@ -7,7 +7,7 @@
 clear all;
 close all;
 %Load the results (note: change this directory to your local one)
-load('C:\Users\user\Documents\GitHub\enph253-2015-team13\Lab\Vertical Bare Rod - End in Ice\June15VertBareRodSteadyState-EndHoleInIce');
+load('June15VertBareRodSteadyState-EndHoleInIce');
 
 %load tmp sensor calibration file
 run offsetCalc.m;

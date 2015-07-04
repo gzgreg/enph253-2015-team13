@@ -1,27 +1,33 @@
-function F = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, readingF) 
+function [F, T] = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, readingF, offsets2, amb1, Pin, eq, iceEnd) 
     %Finite difference calculations for aluminum rod transients
     %param meanings: 1 = k, 2 = kcIn, 3 = epsIn, 4 = kcOut, 5 = epsOut
     
     %Temp sensor calibration stuff
     factors = [1.79 1.81 1.53 1.46 2.06 2];
     offsets = [4.14 2.25 0.16 3.64 -0.35 0];
+    sensorPos = [1 6 9 12 19];
 
     sigma = 5.670e-8; % W /^-2 K^-4
     c = 910; %specific heat capacity
     rho = 2700; %kg/m^3
 
-    Pin = 9.9; %input power from resistor
     L = 0.305; %length
     r = 0.0111; %radius
     A = pi*r^2;
 
-    Tamb = 26.9195; %ambient temperature
+    if(amb1)
+        Tamb = mean(squeeze(readings(1, 1, 1:35)))/2; %ambient temperature
+        factors = [2 factors(1:5)];
+        offsets = [0 offsets(1:5)];
+    else
+        Tamb = mean(squeeze(readings(1, 6, 1:35)))/2;
+    end
 
-    nstepsT = 6420;
+    nstepsT = ceil(readings(3, 6, readingF));
 
-    time = 6420; %seconds
+    time = nstepsT; %seconds
 
-    nstepsX = 22;
+    nstepsX = 19;
 
     dt = time / nstepsT;
     dx = L / nstepsX;
@@ -37,15 +43,22 @@ function F = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, read
     for i = 1:(nstepsT)
         for j = 1:(nstepsX + 1)
             if j == nstepsX + 1
-                S = dx*pi*r*2 + A;
+                S = A;
                 Pcond = 0;
-                eps = param(5);
-                kc = param(4);
+                if(eq)
+                    eps = param(3);
+                    kc = param(2);
+                else
+                    eps = param(5);
+                    kc = param(4);
+                end
+                if(iceEnd) Tamb = 0; end;%(ice water)
             else
                 S = dx*pi*r*2;
                 Pcond = -param(1)*A*(T(i, j) - T(i, j+1))/dx;
                 eps = param(3);
                 kc = param(2); %represents heat loss through insulation: actually probably conduction
+                if(iceEnd) Tamb = T(1, 1); end; %(ice water)
             end
             Pconv = -S * (T(i, j) - Tamb) * kc;
             Prad = -eps * S * sigma * ((T(i, j) + 273.15)^4 - (Tamb+273.15)^4);
@@ -55,10 +68,19 @@ function F = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, read
         end
     end
     rng = reading1:readingF;
-    F(1, :) = interp1((1:length(T(:, 1)))+tOffset, T(:, 1), squeeze(readings(3, 1, rng))) - (squeeze(readings(1, 1, rng)) - offsets(1))/factors(1);
-    F(2, :) = interp1((1:length(T(:, 8)))+tOffset, T(:, 8), squeeze(readings(3, 2, rng))) - (squeeze(readings(1, 2, rng)) - offsets(2))/factors(2);
-    F(4, :) = interp1((1:length(T(:, 10)))+tOffset, T(:, 10), squeeze(readings(3, 3, rng))) - (squeeze(readings(1, 3, rng)) - offsets(3))/factors(3);
-    F(3, :) = interp1((1:length(T(:, 14)))+tOffset, T(:, 14), squeeze(readings(3, 4, rng))) - (squeeze(readings(1, 4, rng)) - offsets(4))/factors(4);
-    F(5, :) = interp1((1:length(T(:, 22)))+tOffset, T(:, 22), squeeze(readings(3, 5, rng))) - (squeeze(readings(1, 5, rng)) - offsets(5))/factors(5);
+    for i = 1:5
+        j = i;
+        %if(i == 4); j = 3; elseif(i == 3); j=4; else j = i; end
+        F(j, :) = interp1((1:length(T(:,i)))+tOffset, T(:,sensorPos(i)),squeeze(readings(3, j, rng)))-(squeeze(readings(1, j, rng))-offsets(j))/factors(j)+offsets2(j);
+    end
+
+    p = plot(F');
+    title(param);
+    
+    clrs = 'rbgmk';
+    for i=1:numel(p)
+        set(p(i), 'color', clrs(i));
+    end
+    pause(.01);
 end
 

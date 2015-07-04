@@ -16,9 +16,9 @@ Tsensor(3,:) = 0.5492*squeeze(readings(1,3,:)) + 1.111;
 
 Tsensor(4,:) = 0.5179*squeeze(readings(1,4,:)) + 2.053;
 
-Tsensor(5,:) = 0.4577*squeeze(readings(1,5,:)) - 2.049 ;
+Tsensor(5,:) = 0.4577*squeeze(readings(1,5,:)) - 2.049;
 
-%Tsensor(6,:) = (500/1023)*squeeze(readings(1,6,:));
+Tsensor(6,:) = (500/1023)*squeeze(readings(1,6,:));
 figure
 plot(Tsensor');
 end

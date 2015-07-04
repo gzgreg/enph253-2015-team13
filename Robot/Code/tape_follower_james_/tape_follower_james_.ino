@@ -183,7 +183,7 @@ int editVal(String val) {
       LCD.home();
       LCD.print(val);
       }          
-    LCD.setCursor(0, 1);v 
+    LCD.setCursor(0, 1); 
     LCD.print(knobVal);
     delay(30);
   }

@@ -1,12 +1,11 @@
-function F = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, readingF, amb1, Pin, eq, iceEnd) 
+function [F, T] = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, readingF, offsets2, amb1, Pin, eq, iceEnd) 
     %Finite difference calculations for aluminum rod transients
     %param meanings: 1 = k, 2 = kcIn, 3 = epsIn, 4 = kcOut, 5 = epsOut
     
     %Temp sensor calibration stuff
     factors = [1.79 1.81 1.53 1.46 2.06 2];
     offsets = [4.14 2.25 0.16 3.64 -0.35 0];
-    offsets2 = [0.3312 2.9439 0.75 3.3023 -1.0658 0];
-    sensorPos = [1 7 9 12 19];
+    sensorPos = [1 6 9 12 19];
 
     sigma = 5.670e-8; % W /^-2 K^-4
     c = 910; %specific heat capacity
@@ -17,9 +16,11 @@ function F = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, read
     A = pi*r^2;
 
     if(amb1)
-        Tamb = mean(squeeze(readings(1, 1, 1:180)))/2; %ambient temperature
+        Tamb = mean(squeeze(readings(1, 1, 1:35)))/2; %ambient temperature
+        factors = [2 factors(1:5)];
+        offsets = [0 offsets(1:5)];
     else
-        Tamb = mean(squeeze(readings(1, 6, 1:180)))/2;
+        Tamb = mean(squeeze(readings(1, 6, 1:35)))/2;
     end
 
     nstepsT = ceil(readings(3, 6, readingF));
@@ -42,7 +43,7 @@ function F = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, read
     for i = 1:(nstepsT)
         for j = 1:(nstepsX + 1)
             if j == nstepsX + 1
-                S = dx*pi*r*2 + A;
+                S = A;
                 Pcond = 0;
                 if(eq)
                     eps = param(3);
@@ -70,9 +71,9 @@ function F = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, read
     for i = 1:5
         j = i;
         %if(i == 4); j = 3; elseif(i == 3); j=4; else j = i; end
-        F(j, :) = interp1((1:length(T(:,sensorPos(i))))+tOffset, T(:,sensorPos(i)),squeeze(readings(3, j, rng)))-(squeeze(readings(1, j, rng))-offsets(j))/factors(j)-offsets2(j);
+        F(j, :) = interp1((1:length(T(:,i)))+tOffset, T(:,sensorPos(i)),squeeze(readings(3, j, rng)))-(squeeze(readings(1, j, rng))-offsets(j))/factors(j)+offsets2(j);
     end
-    figure(1);
+
     p = plot(F');
     title(param);
     

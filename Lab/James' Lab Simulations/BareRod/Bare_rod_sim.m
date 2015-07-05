@@ -106,11 +106,11 @@ for i = 2:nstep
 end
 
 %%
-%pwrR_loss = emsvR * sigma * pwrR_Area *dx*(T(nstep)^4-Tamb^4) + kc * pwrR_Area * dx *(T(nstep) - Tamb);%power loss from power resistor
+
 pwrR_rod = P_in;%the power going into the rod is the power going into the last slice (which is the slice adjancent to the power resistor)
 pwrR_tot = 9*.6;%W, 9V*0.6A, this should equal the power loss plus the power in
 pwrFract  = pwrR_rod/(pwrR_tot);%fraction of power going into rod
-
+display(pwrFract);
 
 
 %%
@@ -120,8 +120,8 @@ plot(length - x,T-273);
 hold on
 errorbar(length - sensorPos,sensorDataC(1:5),[3 3 3 3 3],'ro');
 plot(x,Tamb-273,'r');
-title('Simulation of Horizontal Bare Rod');
-legend('Model','data','Ambient temp');
+title('Steady State Heat Transfer in a Horizontal Bare Rod');
+legend('Model','Data','Ambient temp');
 xlabel('{\it x} (m)')
 ylabel('{\it T} (C)')
 set(gca, 'FontSize', 16)

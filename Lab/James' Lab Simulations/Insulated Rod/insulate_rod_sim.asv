@@ -2,8 +2,8 @@
 %ENPH 257 - Insulated Rod simulation
 
 close all;
-%load tmp sensor calibration file
-
+%load data
+load('June1SteadyStateInsulatedHeating.mat')
 
 radius = 0.0111; %m, 
 length = 0.305; %m
@@ -11,9 +11,9 @@ nstep = 50;
 dx = length/nstep;%m
 
 %Thermo constants
-k = 170; %W / (m * K) - conduction
-insulFudge = 10; %fudge factor for power loss through insulation
-pwrFrac = .8;%power fraction
+k = 200; %W / (m * K) - conduction
+insulFudge = 2; %fudge factor for power loss through insulation
+pwrFrac = .9;%power fraction
 
 %measurement points
 h5 = length - 0.006;%m, distance from power resistor
@@ -24,7 +24,7 @@ h1 = length - 0.298;%m, distance from power resistor
 
 
 readRangeStart = 1;
-readRangeEnd = 600;
+readRangeEnd = 50;
 sensorDataC = 1:6;
 
 offset = offsetCalculator('June1TransientInsulatedHeating.mat',200,6);
@@ -44,8 +44,7 @@ T(1) = sensorDataC(1)+273;%K
 
 %Start conditions
 resistorPwr = 12*0.8;%W, 12V 0.8A
-%P_conv = kc * pwrR_Area * (T(1) - Tamb);
-%P_rad = sigma * emsvR * pwrR_Area * (T(1)^4 - Tamb^4);
+
 
 P_in = resistorPwr*pwrFrac;
 P_out = P_in;
@@ -66,10 +65,12 @@ end
 figure
 plot(x,T-273);
 hold on
+errorbar(sensorPos,sensorDataC(1:5),[3 3 3 3 3],'ro');
+plot(x,Tamb-273,'r');
+title('Steady State Heat Transfer in an Insulated Aluminum Rod');
 xlabel('{\it x} (m)')
 ylabel('{\it T} (C)')
 set(gca, 'FontSize', 16)
 set(gca, 'FontName', 'TimesRoman')
-plot(sensorPos,sensorDataC(1:5),'ro');
-plot(x,Tamb-273,'r');
 
+legend('Model','Data','Ambient temp');

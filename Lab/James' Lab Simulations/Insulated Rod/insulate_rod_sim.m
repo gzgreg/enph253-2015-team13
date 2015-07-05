@@ -11,8 +11,8 @@ nstep = 50;
 dx = length/nstep;%m
 
 %Thermo constants
-k = 160; %W / (m * K) - conduction
-insulFudge = 7; %fudge factor for power loss through insulation
+k = 200; %W / (m * K) - conduction
+insulFudge = 2; %fudge factor for power loss through insulation
 pwrFrac = .9;%power fraction
 
 %measurement points
@@ -65,10 +65,12 @@ end
 figure
 plot(x,T-273);
 hold on
+errorbar(sensorPos,sensorDataC(1:5),[3 3 3 3 3],'ro');
+plot(x,Tamb-273,'r');
+title('Steady State Heat Transfer in an Insulated Aluminum Rod');
 xlabel('{\it x} (m)')
 ylabel('{\it T} (C)')
 set(gca, 'FontSize', 16)
 set(gca, 'FontName', 'TimesRoman')
-errorbar(sensorPos,sensorDataC(1:5),[3 3 3 3 3],'ro');
-plot(x,Tamb-273,'r');
 
+legend('Model','Data','Ambient temp');

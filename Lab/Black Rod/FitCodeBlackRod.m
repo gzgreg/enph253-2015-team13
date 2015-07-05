@@ -1,6 +1,6 @@
 load('June17BlackRodHorizontal-Heating.mat');
 
-readings = readings(:, [2 3 5 4 1 6]); %mixed up sensors
+readings = readings(:, [2 3 5 4 1 6], :); %mixed up sensors
 
 lb = [100 0 0.9999 0 0.9999 100];
 ub = [270 Inf 1 Inf 1 10000];

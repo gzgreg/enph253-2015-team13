@@ -118,7 +118,7 @@ pwrFract  = pwrR_rod/(pwrR_tot);%fraction of power going into rod
 figure
 plot(length - x,T-273);
 hold on
-plot(length - sensorPos,sensorDataC(1:5),'ro');
+errorbar(length - sensorPos,sensorDataC(1:5),[3 3 3 3 3],'ro');
 plot(x,Tamb-273,'r');
 title('Simulation of Horizontal Bare Rod');
 legend('Model','data','Ambient temp');

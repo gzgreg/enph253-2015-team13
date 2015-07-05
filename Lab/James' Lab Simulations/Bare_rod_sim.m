@@ -49,13 +49,11 @@ t5end = h5 + width_tape/2;
 
 %%
 
-readRangeStart = 1;
-readRangeEnd = 400;
+readRange = 1:400;
 sensorDataC = 1:6;
-offset = offsetCalculator('June3TransientHeating-Test2-ALLSYSTEMSNOMINAL',80,6);
-calibratedData = Calibrate(readings,readRangeStart,readRangeEnd,6);%calibrates data in reading range
+calibratedData = Calibrate(readings(1,:,readRange));%calibrates data in readRange
 for i = 1:6
-    sensorDataC(i) = mean(calibratedData(i,:)) + offset(i);%C, averages temperature at each sensor and applies additional offset
+    sensorDataC(i) = mean(calibratedData(i,:));%C, averages temperature at each sensor
 end
 
 sensorPos = [h1 h2 h3 h4 h5]; %from end hole

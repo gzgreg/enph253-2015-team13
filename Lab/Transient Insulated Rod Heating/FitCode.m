@@ -1,3 +1,4 @@
+load('june1TransientInsulatedHeating.mat');
 lb = [0 0 0 0 0];
 ub = [Inf Inf 1 Inf 1];
 x = [212 0 0 155.7 1]; %initial guess

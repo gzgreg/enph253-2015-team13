@@ -28,7 +28,7 @@ title('transient with offset applied');
 %%
 %this load will overwrite 'readings' so make sure you're done with it by
 %this point
-load('C:\Users\James\Desktop\Robot\enph253-2015-team13\Lab\Bare_rod_test_June3\June3TransientSteadyState');
+load('June3TransientSteadyState');
 
 %verify that the pins are in the correct order before applying the offset
 %{

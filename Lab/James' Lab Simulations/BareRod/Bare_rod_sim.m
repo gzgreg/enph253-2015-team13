@@ -6,7 +6,7 @@
 
 clear all;
 close all;
-%Load the results (note: change this directory to your local one)
+%Load the results 
 load('June3TransientSteadyState');
 
 %%

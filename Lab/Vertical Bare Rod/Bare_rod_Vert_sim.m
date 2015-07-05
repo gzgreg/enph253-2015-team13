@@ -7,7 +7,7 @@
 clear all;
 close all;
 %Load the results (note: change this directory to your local one)
-load('C:\Users\James\Desktop\Robot\enph253-2015-team13\Lab\Vertical Bare Rod\June10VertBareRodSteadyState-BottomPowered');
+load('June10VertBareRodSteadyState-BottomPowered');
 
 %load tmp sensor calibration file
 %run offsetCalc.m;

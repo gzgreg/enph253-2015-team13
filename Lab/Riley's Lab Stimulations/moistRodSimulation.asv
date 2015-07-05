@@ -6,16 +6,13 @@
 
 clear all;
 close all;
-%Load the results 
+%Load the results (note: change this directory to your local one)
 load('June12MoistRodSteadyState');
-
-%%
 
 radius = 0.0111; %m
 length = 0.305; %m
 nstep = 50;
 dx = length/nstep;%m
-
 %%
 
 %Thermo constants
@@ -55,7 +52,7 @@ readRangeStart = 1;
 readRangeEnd = 400;
 sensorDataC = 1:6;
 
-offset = offsetCalculator('June12MoistRodHeating',80,6);
+offset = offsetCalculator('June3TransientHeating-Test2-ALLSYSTEMSNOMINAL',80,6);
 calibratedData = Calibrate(readings,readRangeStart,readRangeEnd,6);%calibrates data in reading range
 for i = 1:6
     sensorDataC(i) = mean(calibratedData(i,:)) + offset(i);%C, averages temperature at each sensor and applies additional offset
@@ -133,7 +130,7 @@ plot(length - x,T-273);
 hold on
 plot(length - sensorPos,sensorDataC(1:5),'ro');
 plot(x,Tamb-273,'r');
-title('Simulation of Horizontal Moist Rod');
+title('Simulation of Horizontal Bare Rod');
 legend('Model','data','Ambient temp');
 xlabel('{\it x} (m)')
 ylabel('{\it T} (C)')

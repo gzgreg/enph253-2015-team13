@@ -1,7 +1,7 @@
 %2015.06.10
 %ENPH 257 - Insulated Rod simulation
 
-close all;
+
 %load tmp sensor calibration file
 run InsulatedRodOffset.m;
 
@@ -62,14 +62,14 @@ x(1) = dx;
 for i = 2:nstep
     x(i) = i*dx;
     T(i) = T(i-1);
-    P_in(i) = P_out;
+    P_in = P_out;
     P_loss = insulFudge*(2*pi*radius*dx)*(T(i) - Tamb);
-    P_out = P_in(i) - P_loss;
-    dT = -P_in(i) * dx/(k * pi * radius^2);
+    P_out = P_in - P_loss;
+    dT = -P_out * dx/(k * pi * radius^2);
     T(i) = T(i) - dT;
 end
 
-plot(P_in)
+
 figure
 plot(x,T-273);
 hold on

@@ -21,8 +21,8 @@ end
 figure(2);
 hold off
 for i=1:6
-    plot(squeeze(readings(3, i, :)), (squeeze(readings(1, i, :)) - offsets(i)) / factors(i) - offsets2(i), colors(i+1-amb1))
+    plot(squeeze(readings(3, i, :)), (squeeze(readings(1, i, :)) - offsets(i)) / factors(i) - offsets2(i), colors(i+1))
     hold on
-    if(i < 6); plot((1:length(T(:, i)))+tOffset, T(:, sensorPos(i)), colors(i + 1 - amb1)); end;
+    if(i < 6); plot((1:length(T(:, i)))+tOffset, T(:, sensorPos(i)), colors(i+2)); end;
 end
 hold off;

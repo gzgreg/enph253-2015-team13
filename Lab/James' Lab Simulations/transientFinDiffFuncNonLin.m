@@ -1,14 +1,38 @@
-function [F, T] = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, readingF, offsets2, amb1, Pin, eq, iceEnd) 
+function [F, T] = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, readingF, offsets2, amb1, Pin, eq, iceEnd, blackRod) 
     %Finite difference calculations for aluminum rod transients
-    %param meanings: 1 = k, 2 = kcIn, 3 = epsIn, 4 = kcOut, 5 = epsOut
+    %param meanings: 1=k, 2=kc, 3=eps, 4=kcEnd, 5=epsEnd, 6=c. Parameters 
+    %that are not used in a particular scenario are
+    %ignored.
+    %Other parameters:
+    %readings: Data from sensors
+    %tOffset: starting time for heating
+    %reading1: starting reading for heating
+    %readingF: final reading to use
+    %offsets2: secondary offset to ensure all sensors are identical
+    %initially
+    %amb1: whether the ambient pin is 1 (if false, 6)
+    %Pin: input power to rod
+    %eq: whether kc and eps are equal inside and at end of rod
+    %iceEnd: whether the end of the rod is 0 degrees C
+    %blackRod: for black rod experiment: shuffles sensors
+    %Return values:
+    %F: a matrix containing the errors in each reading
+    %T: a matrix containing temperatures for the sensor locations.
     
     %Temp sensor calibration stuff
     factors = [1.79 1.81 1.53 1.46 2.06 2];
     offsets = [4.14 2.25 0.16 3.64 -0.35 0];
+    
+    %shuffle sensors for black rod
+    if(blackRod)
+        factors = factors([2 3 5 4 1 6]);
+        offsets = offsets([2 3 5 4 1 6]);
+    end
+    
     sensorPos = [1 6 9 12 19];
 
     sigma = 5.670e-8; % W /^-2 K^-4
-    c = 910; %specific heat capacity
+    c = param(6); %specific heat capacity
     rho = 2700; %kg/m^3
 
     L = 0.305; %length

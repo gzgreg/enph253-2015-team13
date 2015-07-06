@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Bare_rod_sim</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-07-05"><meta name="DC.source" content="Bare_rod_sim.m"><style type="text/css">
+      --><title>Vert_Bare_Top_Heat</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-07-05"><meta name="DC.source" content="Vert_Bare_Top_Heat.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -65,12 +65,12 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Horizontal Bare rod Steady State simulation</a></li><li><a href="#8"><img src="Bare_rod_sim_eq42168.png" alt="$P_{conv} = k_c  (Area) dx (T(1) - T_{amb})$"></a></li><li><a href="#9"><img src="Bare_rod_sim_eq05628.png" alt="$P_{rad} = \sigma  (Area) dx (T(1)^4 - T_{amb}^4)$"></a></li></ul></div><h2>Horizontal Bare rod Steady State simulation<a name="1"></a></h2><pre class="codeinput"><span class="comment">%2015.06.03</span>
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Vertical Bare Rod - Top Heating Steady State simulation</a></li><li><a href="#8"><img src="Vert_Bare_Top_Heat_eq42168.png" alt="$P_{conv} = k_c  (Area) dx (T(1) - T_{amb})$"></a></li><li><a href="#9"><img src="Vert_Bare_Top_Heat_eq05628.png" alt="$P_{rad} = \sigma  (Area) dx (T(1)^4 - T_{amb}^4)$"></a></li></ul></div><h2>Vertical Bare Rod - Top Heating Steady State simulation<a name="1"></a></h2><pre class="codeinput"><span class="comment">%2015.06.03</span>
 <span class="comment">%ENPH 257 Lab - Group 13</span>
 </pre><pre class="codeinput">clear <span class="string">all</span>;
 close <span class="string">all</span>;
 <span class="comment">%Load the results</span>
-load(<span class="string">'June3TransientSteadyState'</span>);
+load(<span class="string">'june10VertBareRodSteadyState-TopPowered'</span>);
 </pre><pre class="codeinput">radius = 0.0111; <span class="comment">%m</span>
 length = 0.305; <span class="comment">%m</span>
 nstep = 50;
@@ -79,6 +79,7 @@ dx = length/nstep;<span class="comment">%m</span>
 k = 200; <span class="comment">%W / (m * K) - conduction</span>
 sigma = 5.67e-8;<span class="comment">%W / (m^2 * K^4) stefan-boltzman const</span>
 emsv = 0.2; <span class="comment">% emissivity</span>
+fudge = 1.0; <span class="comment">%fudge factor for convection</span>
 alpha = 1.9e-5;  <span class="comment">%m^2/s kinematic viscosity of air</span>
 g = 9.81; <span class="comment">%m/s^2</span>
 kc = 20; <span class="comment">%W / (m^2 * K)</span>
@@ -102,11 +103,11 @@ t4end = h4 + width_tape/2;
 t4st = h4 - width_tape/2;
 t5end = h5 + width_tape/2;
 </pre><pre class="codeinput">readRangeStart = 1;
-readRangeEnd = 400;
+readRangeEnd = 100;
 sensorDataC = 1:6;
 
-offset = offsetCalculator(<span class="string">'June3TransientHeating-Test2-ALLSYSTEMSNOMINAL'</span>,80,6);
-calibratedData = Calibrate(readings,readRangeStart,readRangeEnd,6);<span class="comment">%calibrates data in reading range</span>
+offset = offsetCalculator(<span class="string">'June10VertBareRodHeating-TopPower'</span>,20,1);
+calibratedData = Calibrate(readings,readRangeStart,readRangeEnd,1);<span class="comment">%calibrates data in reading range</span>
 <span class="keyword">for</span> i = 1:6
     sensorDataC(i) = mean(calibratedData(i,:)) + offset(i);<span class="comment">%C, averages temperature at each sensor and applies additional offset</span>
 <span class="keyword">end</span>
@@ -119,9 +120,9 @@ T = 1:nstep;<span class="comment">%just placeholder data</span>
 Tamb = sensorDataC(6)+273;<span class="comment">%K</span>
 T(1) = sensorDataC(5)+273;<span class="comment">%K</span>
 </pre><pre class="codeinput"><span class="comment">%End conditions</span>
-</pre><h2><img src="Bare_rod_sim_eq42168.png" alt="$P_{conv} = k_c  (Area) dx (T(1) - T_{amb})$"><a name="8"></a></h2><pre class="codeinput">P_conv_end = kc * pi * radius^2 * (T(1) - Tamb);
+</pre><h2><img src="Vert_Bare_Top_Heat_eq42168.png" alt="$P_{conv} = k_c  (Area) dx (T(1) - T_{amb})$"><a name="8"></a></h2><pre class="codeinput">P_conv_end = kc * pi * radius^2 * (T(1) - Tamb);
 P_conv_cyl = kc * 2 * pi * radius * dx * (T(1) - Tamb);<span class="comment">%convection power loss for the cylindrical part of the end of the rod</span>
-</pre><h2><img src="Bare_rod_sim_eq05628.png" alt="$P_{rad} = \sigma  (Area) dx (T(1)^4 - T_{amb}^4)$"><a name="9"></a></h2><pre class="codeinput">P_rad_end = sigma * emsv * pi * radius^2 *(T(1)^4 - Tamb^4);
+</pre><h2><img src="Vert_Bare_Top_Heat_eq05628.png" alt="$P_{rad} = \sigma  (Area) dx (T(1)^4 - T_{amb}^4)$"><a name="9"></a></h2><pre class="codeinput">P_rad_end = sigma * emsv * pi * radius^2 *(T(1)^4 - Tamb^4);
 P_rad_cyl = sigma * emsv_elec_tape * 2 * pi * radius * dx *(T(1)^4 - Tamb^4);
 
 P_out = P_conv_end + P_conv_cyl + P_rad_end + P_rad_cyl;
@@ -133,7 +134,7 @@ x(1) = dx;
    T(i) = T(i-1);
 
    <span class="comment">%is the slice covered in electrical tape or not?</span>
-   <span class="keyword">if</span> (x(i) &lt; t5end) || (x(i) &gt; t4st &amp;&amp; x(i) &lt; t4end) || (x(i) &gt; t3st &amp;&amp; x(i) &lt; t3end) || (x(i) &gt; t2st &amp;&amp; x(i) &lt; t2end) || x(i) &gt; t1st
+   <span class="keyword">if</span> (x &lt; t5end) | (x &gt; t4st &amp; x &lt; t4end) | (x &gt; t3st &amp; x &lt; t3end) | (x &gt; t2st &amp; x &lt; t2end) | (x &gt; t1st)
        P_conv_cyl = kc * 2 * pi * radius * dx *(T(i) - Tamb);
        P_rad = emsv_elec_tape * sigma * (2*pi*radius)*dx*(T(i)^4-Tamb^4);
        P_loss = P_conv_cyl + P_rad;
@@ -147,29 +148,24 @@ x(1) = dx;
    dT = P_in * dx/(k * pi * radius^2);
    T(i) = T(i) + dT;
 <span class="keyword">end</span>
-</pre><pre class="codeinput">pwrR_rod = P_in;<span class="comment">%the power going into the rod is the power going into the last slice (which is the slice adjancent to the power resistor)</span>
+</pre><pre class="codeinput"><span class="comment">%pwrR_loss = emsvR * sigma * pwrR_Area *dx*(T(nstep)^4-Tamb^4) + kc * pwrR_Area * dx *(T(nstep) - Tamb);%power loss from power resistor</span>
+pwrR_rod = P_in;<span class="comment">%the power going into the rod is the power going into the last slice (which is the slice adjancent to the power resistor)</span>
 pwrR_tot = 9*.6;<span class="comment">%W, 9V*0.6A, this should equal the power loss plus the power in</span>
 pwrFract  = pwrR_rod/(pwrR_tot);<span class="comment">%fraction of power going into rod</span>
-display(pwrFract);
-</pre><pre class="codeoutput">
-pwrFract =
-
-   0.964644349795173
-
 </pre><pre class="codeinput">figure
 plot(length - x,T-273);
 hold <span class="string">on</span>
 errorbar(length - sensorPos,sensorDataC(1:5),[3 3 3 3 3],<span class="string">'ro'</span>);
 plot(x,Tamb-273,<span class="string">'r'</span>);
-title(<span class="string">'Steady State Heat Transfer in a Horizontal Bare Rod'</span>);
-legend(<span class="string">'Model'</span>,<span class="string">'Data'</span>,<span class="string">'Ambient temp'</span>);
+title(<span class="string">'Simulation of Vertical Bare - Top Heating Rod'</span>);
+legend(<span class="string">'Model'</span>,<span class="string">'data'</span>,<span class="string">'Ambient temp'</span>);
 xlabel(<span class="string">'{\it x} (m)'</span>)
 ylabel(<span class="string">'{\it T} (C)'</span>)
 set(gca, <span class="string">'FontSize'</span>, 16)
 set(gca, <span class="string">'FontName'</span>, <span class="string">'TimesRoman'</span>)
-</pre><img vspace="5" hspace="5" src="Bare_rod_sim_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+</pre><img vspace="5" hspace="5" src="Vert_Bare_Top_Heat_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
-%% Horizontal Bare rod Steady State simulation
+%% Vertical Bare Rod - Top Heating Steady State simulation
 %2015.06.03
 %ENPH 257 Lab - Group 13
 
@@ -178,7 +174,7 @@ set(gca, <span class="string">'FontName'</span>, <span class="string">'TimesRoma
 clear all;
 close all;
 %Load the results 
-load('June3TransientSteadyState');
+load('june10VertBareRodSteadyState-TopPowered');
 
 %%
 
@@ -192,6 +188,7 @@ dx = length/nstep;%m
 k = 200; %W / (m * K) - conduction
 sigma = 5.67e-8;%W / (m^2 * K^4) stefan-boltzman const
 emsv = 0.2; % emissivity
+fudge = 1.0; %fudge factor for convection
 alpha = 1.9e-5;  %m^2/s kinematic viscosity of air
 g = 9.81; %m/s^2
 kc = 20; %W / (m^2 * K)
@@ -220,11 +217,11 @@ t5end = h5 + width_tape/2;
 %%
 
 readRangeStart = 1;
-readRangeEnd = 400;
+readRangeEnd = 100;
 sensorDataC = 1:6;
 
-offset = offsetCalculator('June3TransientHeating-Test2-ALLSYSTEMSNOMINAL',80,6);
-calibratedData = Calibrate(readings,readRangeStart,readRangeEnd,6);%calibrates data in reading range
+offset = offsetCalculator('June10VertBareRodHeating-TopPower',20,1);
+calibratedData = Calibrate(readings,readRangeStart,readRangeEnd,1);%calibrates data in reading range
 for i = 1:6
     sensorDataC(i) = mean(calibratedData(i,:)) + offset(i);%C, averages temperature at each sensor and applies additional offset
 end
@@ -260,7 +257,7 @@ for i = 2:nstep
    T(i) = T(i-1);
    
    %is the slice covered in electrical tape or not?
-   if (x(i) < t5end) || (x(i) > t4st && x(i) < t4end) || (x(i) > t3st && x(i) < t3end) || (x(i) > t2st && x(i) < t2end) || x(i) > t1st 
+   if (x < t5end) | (x > t4st & x < t4end) | (x > t3st & x < t3end) | (x > t2st & x < t2end) | (x > t1st) 
        P_conv_cyl = kc * 2 * pi * radius * dx *(T(i) - Tamb);
        P_rad = emsv_elec_tape * sigma * (2*pi*radius)*dx*(T(i)^4-Tamb^4);
        P_loss = P_conv_cyl + P_rad;
@@ -276,11 +273,11 @@ for i = 2:nstep
 end
 
 %%
-
+%pwrR_loss = emsvR * sigma * pwrR_Area *dx*(T(nstep)^4-Tamb^4) + kc * pwrR_Area * dx *(T(nstep) - Tamb);%power loss from power resistor
 pwrR_rod = P_in;%the power going into the rod is the power going into the last slice (which is the slice adjancent to the power resistor)
 pwrR_tot = 9*.6;%W, 9V*0.6A, this should equal the power loss plus the power in
 pwrFract  = pwrR_rod/(pwrR_tot);%fraction of power going into rod
-display(pwrFract);
+
 
 
 %%
@@ -290,14 +287,11 @@ plot(length - x,T-273);
 hold on
 errorbar(length - sensorPos,sensorDataC(1:5),[3 3 3 3 3],'ro');
 plot(x,Tamb-273,'r');
-title('Steady State Heat Transfer in a Horizontal Bare Rod');
-legend('Model','Data','Ambient temp');
+title('Simulation of Vertical Bare - Top Heating Rod');
+legend('Model','data','Ambient temp');
 xlabel('{\it x} (m)')
 ylabel('{\it T} (C)')
 set(gca, 'FontSize', 16)
 set(gca, 'FontName', 'TimesRoman')
-
-
-
 ##### SOURCE END #####
 --></body></html>

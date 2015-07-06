@@ -11,16 +11,16 @@
 function Tsensor = Calibrate(readings,rangeStart,rangeEnd,ambPin)
 
 pin = [1:(ambPin-1) (ambPin+1):6];%pins in order that are NOT the ambient temp pin
-Tsensor(pin(1),:) = 0.4737*squeeze(readings(1,2,rangeStart:rangeEnd)) - 1.02;
+Tsensor(1,:) = 0.4737*squeeze(readings(1,pin(1),rangeStart:rangeEnd)) - 1.02;
 
-Tsensor(pin(2),:) = 0.4525*squeeze(readings(1,3,rangeStart:rangeEnd)) + .8524;
+Tsensor(2,:) = 1.023*squeeze(readings(1,pin(2),rangeStart:rangeEnd)) + .8524;
 
-Tsensor(pin(3),:) = 0.5492*squeeze(readings(1,5,rangeStart:rangeEnd)) + 1.111;
+Tsensor(3,:) = 0.8031*squeeze(readings(1,pin(3),rangeStart:rangeEnd)) + 1.111;
 
-Tsensor(pin(4),:) = 0.5179*squeeze(readings(1,4,rangeStart:rangeEnd)) + 2.053;
+Tsensor(4,:) = 0.5179*squeeze(readings(1,pin(4),rangeStart:rangeEnd)) + 2.053;
 
-Tsensor(pin(5),:) = 0.4577*squeeze(readings(1,1,rangeStart:rangeEnd)) - 2.049;
+Tsensor(5,:) = 0.4577*squeeze(readings(1,pin(5),rangeStart:rangeEnd)) - 2.049;
 
-Tsensor(ambPin,:) = (500/1023)*squeeze(readings(1,6,rangeStart:rangeEnd));
+Tsensor(6,:) = (500/1023)*squeeze(readings(1,ambPin,rangeStart:rangeEnd));
 
 end

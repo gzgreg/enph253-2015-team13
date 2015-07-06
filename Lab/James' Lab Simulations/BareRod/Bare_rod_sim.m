@@ -21,7 +21,6 @@ dx = length/nstep;%m
 k = 200; %W / (m * K) - conduction
 sigma = 5.67e-8;%W / (m^2 * K^4) stefan-boltzman const
 emsv = 0.2; % emissivity
-fudge = 1.0; %fudge factor for convection
 alpha = 1.9e-5;  %m^2/s kinematic viscosity of air
 g = 9.81; %m/s^2
 kc = 20; %W / (m^2 * K)
@@ -90,7 +89,7 @@ for i = 2:nstep
    T(i) = T(i-1);
    
    %is the slice covered in electrical tape or not?
-   if (x < t5end) | (x > t4st & x < t4end) | (x > t3st & x < t3end) | (x > t2st & x < t2end) | (x > t1st) 
+   if (x(i) < t5end) || (x(i) > t4st && x(i) < t4end) || (x(i) > t3st && x(i) < t3end) || (x(i) > t2st && x(i) < t2end) || x(i) > t1st 
        P_conv_cyl = kc * 2 * pi * radius * dx *(T(i) - Tamb);
        P_rad = emsv_elec_tape * sigma * (2*pi*radius)*dx*(T(i)^4-Tamb^4);
        P_loss = P_conv_cyl + P_rad;

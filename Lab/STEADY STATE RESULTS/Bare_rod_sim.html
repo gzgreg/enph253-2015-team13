@@ -1,8 +1,7 @@
-
-<!DOCTYPE html
-  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head>
-      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0118)file:///C:/Users/James/Desktop/Robot/enph253-2015-team13/Lab/James'%20Lab%20Simulations/BareRod/html/Bare_rod_sim.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
@@ -65,7 +64,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Horizontal Bare rod Steady State simulation</a></li><li><a href="#8"><img src="Bare_rod_sim_eq42168.png" alt="$P_{conv} = k_c  (Area) dx (T(1) - T_{amb})$"></a></li><li><a href="#9"><img src="Bare_rod_sim_eq05628.png" alt="$P_{rad} = \sigma  (Area) dx (T(1)^4 - T_{amb}^4)$"></a></li></ul></div><h2>Horizontal Bare rod Steady State simulation<a name="1"></a></h2><pre class="codeinput"><span class="comment">%2015.06.03</span>
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="file:///C:/Users/James/Desktop/Robot/enph253-2015-team13/Lab/James'%20Lab%20Simulations/BareRod/html/Bare_rod_sim.html#1">Horizontal Bare rod Steady State simulation</a></li><li><a href="file:///C:/Users/James/Desktop/Robot/enph253-2015-team13/Lab/James'%20Lab%20Simulations/BareRod/html/Bare_rod_sim.html#8"><img src="./Bare_rod_sim_files/Bare_rod_sim_eq42168.png" alt="$P_{conv} = k_c  (Area) dx (T(1) - T_{amb})$"></a></li><li><a href="file:///C:/Users/James/Desktop/Robot/enph253-2015-team13/Lab/James'%20Lab%20Simulations/BareRod/html/Bare_rod_sim.html#9"><img src="./Bare_rod_sim_files/Bare_rod_sim_eq05628.png" alt="$P_{rad} = \sigma  (Area) dx (T(1)^4 - T_{amb}^4)$"></a></li></ul></div><h2>Horizontal Bare rod Steady State simulation<a name="1"></a></h2><pre class="codeinput"><span class="comment">%2015.06.03</span>
 <span class="comment">%ENPH 257 Lab - Group 13</span>
 </pre><pre class="codeinput">clear <span class="string">all</span>;
 close <span class="string">all</span>;
@@ -119,9 +118,9 @@ T = 1:nstep;<span class="comment">%just placeholder data</span>
 Tamb = sensorDataC(6)+273;<span class="comment">%K</span>
 T(1) = sensorDataC(5)+273;<span class="comment">%K</span>
 </pre><pre class="codeinput"><span class="comment">%End conditions</span>
-</pre><h2><img src="Bare_rod_sim_eq42168.png" alt="$P_{conv} = k_c  (Area) dx (T(1) - T_{amb})$"><a name="8"></a></h2><pre class="codeinput">P_conv_end = kc * pi * radius^2 * (T(1) - Tamb);
+</pre><h2><img src="./Bare_rod_sim_files/Bare_rod_sim_eq42168.png" alt="$P_{conv} = k_c  (Area) dx (T(1) - T_{amb})$"><a name="8"></a></h2><pre class="codeinput">P_conv_end = kc * pi * radius^2 * (T(1) - Tamb);
 P_conv_cyl = kc * 2 * pi * radius * dx * (T(1) - Tamb);<span class="comment">%convection power loss for the cylindrical part of the end of the rod</span>
-</pre><h2><img src="Bare_rod_sim_eq05628.png" alt="$P_{rad} = \sigma  (Area) dx (T(1)^4 - T_{amb}^4)$"><a name="9"></a></h2><pre class="codeinput">P_rad_end = sigma * emsv * pi * radius^2 *(T(1)^4 - Tamb^4);
+</pre><h2><img src="./Bare_rod_sim_files/Bare_rod_sim_eq05628.png" alt="$P_{rad} = \sigma  (Area) dx (T(1)^4 - T_{amb}^4)$"><a name="9"></a></h2><pre class="codeinput">P_rad_end = sigma * emsv * pi * radius^2 *(T(1)^4 - Tamb^4);
 P_rad_cyl = sigma * emsv_elec_tape * 2 * pi * radius * dx *(T(1)^4 - Tamb^4);
 
 P_out = P_conv_end + P_conv_cyl + P_rad_end + P_rad_cyl;
@@ -151,8 +150,7 @@ x(1) = dx;
 pwrR_tot = 9*.6;<span class="comment">%W, 9V*0.6A, this should equal the power loss plus the power in</span>
 pwrFract  = pwrR_rod/(pwrR_tot);<span class="comment">%fraction of power going into rod</span>
 display(pwrFract);
-</pre><pre class="codeoutput">
-pwrFract =
+</pre><pre class="codeoutput">pwrFract =
 
    0.964644349795173
 
@@ -167,7 +165,7 @@ xlabel(<span class="string">'{\it x} (m)'</span>)
 ylabel(<span class="string">'{\it T} (C)'</span>)
 set(gca, <span class="string">'FontSize'</span>, 16)
 set(gca, <span class="string">'FontName'</span>, <span class="string">'TimesRoman'</span>)
-</pre><img vspace="5" hspace="5" src="Bare_rod_sim_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+</pre><img vspace="5" hspace="5" src="./Bare_rod_sim_files/Bare_rod_sim_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB® R2012b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Horizontal Bare rod Steady State simulation
 %2015.06.03

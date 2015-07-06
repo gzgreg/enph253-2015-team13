@@ -22,17 +22,16 @@ dx = length/nstep;%m
 k = 200; %W / (m * K) - conduction
 sigma = 5.67e-8;%W / (m^2 * K^4) stefan-boltzman const
 emsv = 0.95; % emissivity
-moist_kc = 5.0; %W / (m^2 * K)
-fudgeE = 2.0; %fudge factor for evaporation
+moist_kc = 12.0; %fudge factor for convection
+fudgeE = 1.0; %fudge factor for evaporation
 alpha = 1.9e-5;  %m^2/s kinematic viscosity of air
 g = 9.81; %m/s^2
-kc = 20.0; %W / (m^2 * K)
+kc = 12.0; %W / (m^2 * K)
 emsv_elec_tape = 0.95;
 emsv_cloth = 0.9;
 width_tape = .020;%m, width of the electrical tape
 pwrR_Area = ((15.5*20.7) + 2*(15.5*2) + 2*(20.7*2))*10^-6;%m^2, area of pwr resistor
 emsvR = 0.8;%emsivity of power resistor
-totalEvapPower = 0.0;
 %%
 
 %measurement points
@@ -96,23 +95,19 @@ for i = 2:nstep
   
    
    %is the slice on the tape or not?
- if (x(i) < t5end) || (x(i) > t4st && x(i) < t4end) || (x(i) > t3st && x(i) < t3end) || (x(i) > t2st && x(i) < t2end) || (x(i) > t1st) 
+   if (x(i) < t5end) | x(i) > t4st & x(i) < t4end) | (x > t3st & x < t3end) | (x > t2st & x < t2end) | (x > t1st) 
        P_conv = kc * 2 * pi * radius * dx *(T(i) - Tamb);
        P_rad = emsv_elec_tape * sigma * (2*pi*radius)*dx*(T(i)^4-Tamb^4);
        P_loss = P_conv + P_rad;
- else
-     
-     if (x(i) < t4st && x(i) > t5end )
+   else
+       if (x < t4st & x > t5end )
            display(5)
            P_conv = moist_kc * 2 * pi * radius * dx *(T(i) - Tamb);
            P_rad = emsv_cloth * sigma * (2*pi*radius) * dx * (T(i)^4-Tamb^4);
-           P_evap = fudgeE * dx * (T(i)-Tamb);
+           P_evap = fudgeE * dx * (T(i)^4-Tamb^4);
            P_loss = P_conv + P_rad + P_evap;
            
-           totalEvapPower = totalEvapPower + P_evap;
-           
        else
-   
            P_conv = kc * 2 * pi * radius * dx *(T(i) - Tamb);
            P_rad = emsv * sigma * (2*pi*radius)*dx*(T(i)^4-Tamb^4);
            P_loss = P_conv + P_rad;
@@ -146,8 +141,5 @@ xlabel('{\it x} (m)')
 ylabel('{\it T} (C)')
 set(gca, 'FontSize', 16)
 set(gca, 'FontName', 'TimesRoman')
-
-totalWaterEvap = totalEvapPower / 2260
-display(totalEvapPower)
 
 

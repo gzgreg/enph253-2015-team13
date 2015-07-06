@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0130)file:///C:/Users/James/Desktop/Robot/enph253-2015-team13/Lab/James'%20Lab%20Simulations/Insulated%20Rod/html/insulate_rod_sim.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>insulate_rod_sim</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-07-05"><meta name="DC.source" content="insulate_rod_sim.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="file:///C:/Users/James/Desktop/Robot/enph253-2015-team13/Lab/James'%20Lab%20Simulations/Insulated%20Rod/html/insulate_rod_sim.html#1">Insulated Rod Simulation</a></li><li><a href="file:///C:/Users/James/Desktop/Robot/enph253-2015-team13/Lab/James'%20Lab%20Simulations/Insulated%20Rod/html/insulate_rod_sim.html#6">Calibration</a></li></ul></div><h2>Insulated Rod Simulation<a name="1"></a></h2><pre class="codeinput"><span class="comment">%ENPH 257 -group 13</span>
+</pre><pre class="codeinput">close <span class="string">all</span>;
+<span class="comment">%load data</span>
+load(<span class="string">'June1SteadyStateInsulatedHeating.mat'</span>)
+</pre><pre class="codeinput">radius = 0.0111; <span class="comment">%m,</span>
+length = 0.305; <span class="comment">%m</span>
+nstep = 50;
+dx = length/nstep;<span class="comment">%m</span>
+</pre><pre class="codeinput"><span class="comment">%Thermo constants</span>
+k = 180; <span class="comment">%W / (m * K) - conduction</span>
+insulFudge = 4; <span class="comment">%fudge factor for power loss through insulation</span>
+pwrFrac = .9;<span class="comment">%power fraction</span>
+</pre><pre class="codeinput"><span class="comment">%measurement points</span>
+h5 = length - 0.006;<span class="comment">%m, distance from power resistor</span>
+h4 = length - 0.105;<span class="comment">%m, distance from power resistor</span>
+h3 = length - 0.163;<span class="comment">%m, distance from power resistor</span>
+h2 = length - 0.207;<span class="comment">%m, distance from power resistor</span>
+h1 = length - 0.298;<span class="comment">%m, distance from power resistor</span>
+</pre><h2>Calibration<a name="6"></a></h2><pre class="codeinput">readRangeStart = 1;
+readRangeEnd = 50;
+sensorDataC = 1:6;
+offset = offsetCalculator(<span class="string">'June1TransientInsulatedHeating.mat'</span>,200,6);
+calibratedData = Calibrate(readings,readRangeStart,readRangeEnd,6);<span class="comment">%calibrates data in reading range</span>
+<span class="keyword">for</span> i = 1:6
+    sensorDataC(i) = mean(calibratedData(i,:)) + offset(i);<span class="comment">%C, averages temperature at each sensor and applies additional offset</span>
+<span class="keyword">end</span>
+sensorPos = [h1 h2 h3 h4 h5]; <span class="comment">%from end hole</span>
+
+x = 1:nstep;<span class="comment">%just placeholder data</span>
+T = 1:nstep;<span class="comment">%just placeholder data</span>
+
+Tamb = sensorDataC(6)+273;<span class="comment">%K</span>
+T(1) = sensorDataC(1)+273;<span class="comment">%K</span>
+</pre><pre class="codeinput"><span class="comment">%Start conditions</span>
+resistorPwr = 12*0.8;<span class="comment">%W, 12V 0.8A</span>
+P_in = resistorPwr*pwrFrac;
+P_out = P_in;
+x(1) = dx;
+
+
+<span class="keyword">for</span> i = 2:nstep
+    x(i) = i*dx;
+    T(i) = T(i-1);
+    P_in(i) = P_out;
+    P_loss = insulFudge*(2*pi*radius*dx)*(T(i) - Tamb);
+    P_out = P_in(i) - P_loss;
+    dT = P_in(i) * dx/(k * pi * radius^2);
+    T(i) = T(i) - dT;
+<span class="keyword">end</span>
+display(P_out);<span class="comment">%power going out heat sink</span>
+</pre><pre class="codeoutput">P_out =
+
+   4.446466858327812
+
+</pre><pre class="codeinput">figure
+plot(x,T-273);
+hold <span class="string">on</span>
+errorbar(sensorPos,sensorDataC(1:5),[3 3 3 3 3],<span class="string">'ro'</span>);
+plot(x,Tamb-273,<span class="string">'r'</span>);
+title(<span class="string">'Steady State Heat Transfer in an Insulated Aluminum Rod'</span>);
+xlabel(<span class="string">'{\it x} (m)'</span>)
+ylabel(<span class="string">'{\it T} (C)'</span>)
+set(gca, <span class="string">'FontSize'</span>, 16)
+set(gca, <span class="string">'FontName'</span>, <span class="string">'TimesRoman'</span>)
+
+legend(<span class="string">'Model'</span>,<span class="string">'Data'</span>,<span class="string">'Ambient temp'</span>);
+</pre><img vspace="5" hspace="5" src="./insulate_rod_sim_files/insulate_rod_sim_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB® R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Insulated Rod Simulation
+%ENPH 257 -group 13
+
+%%
+close all;
+%load data
+load('June1SteadyStateInsulatedHeating.mat')
+%%
+radius = 0.0111; %m, 
+length = 0.305; %m
+nstep = 50;
+dx = length/nstep;%m
+%%
+%Thermo constants
+k = 180; %W / (m * K) - conduction
+insulFudge = 4; %fudge factor for power loss through insulation
+pwrFrac = .9;%power fraction
+%%
+%measurement points
+h5 = length - 0.006;%m, distance from power resistor
+h4 = length - 0.105;%m, distance from power resistor
+h3 = length - 0.163;%m, distance from power resistor
+h2 = length - 0.207;%m, distance from power resistor
+h1 = length - 0.298;%m, distance from power resistor
+
+%% Calibration
+readRangeStart = 1;
+readRangeEnd = 50;
+sensorDataC = 1:6;
+offset = offsetCalculator('June1TransientInsulatedHeating.mat',200,6);
+calibratedData = Calibrate(readings,readRangeStart,readRangeEnd,6);%calibrates data in reading range
+for i = 1:6
+    sensorDataC(i) = mean(calibratedData(i,:)) + offset(i);%C, averages temperature at each sensor and applies additional offset
+end
+sensorPos = [h1 h2 h3 h4 h5]; %from end hole
+
+x = 1:nstep;%just placeholder data
+T = 1:nstep;%just placeholder data
+
+Tamb = sensorDataC(6)+273;%K
+T(1) = sensorDataC(1)+273;%K
+
+
+
+%%
+%Start conditions
+resistorPwr = 12*0.8;%W, 12V 0.8A
+P_in = resistorPwr*pwrFrac;
+P_out = P_in;
+x(1) = dx;
+
+
+for i = 2:nstep
+    x(i) = i*dx;
+    T(i) = T(i-1);
+    P_in(i) = P_out;
+    P_loss = insulFudge*(2*pi*radius*dx)*(T(i) - Tamb);
+    P_out = P_in(i) - P_loss;
+    dT = P_in(i) * dx/(k * pi * radius^2);
+    T(i) = T(i) - dT;
+end
+display(P_out);%power going out heat sink
+%%
+figure
+plot(x,T-273);
+hold on
+errorbar(sensorPos,sensorDataC(1:5),[3 3 3 3 3],'ro');
+plot(x,Tamb-273,'r');
+title('Steady State Heat Transfer in an Insulated Aluminum Rod');
+xlabel('{\it x} (m)')
+ylabel('{\it T} (C)')
+set(gca, 'FontSize', 16)
+set(gca, 'FontName', 'TimesRoman')
+
+legend('Model','Data','Ambient temp');
+
+##### SOURCE END #####
+--></body></html>

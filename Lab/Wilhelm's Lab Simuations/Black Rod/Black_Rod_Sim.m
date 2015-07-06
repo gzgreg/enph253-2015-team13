@@ -24,7 +24,7 @@ emsv = 0.9; % emissivity
 fudge = 1.0; %fudge factor for convection
 alpha = 1.9e-5;  %m^2/s kinematic viscosity of air
 g = 9.81; %m/s^2
-kc = 28; %W / (m^2 * K)
+kc = 26; %W / (m^2 * K)
 emsv_elec_tape = 0.95;
 width_tape = .020;%m, width of the electrical tape
 pwrR_Area = ((.0155*.0207) + 2*(.0155*.002) + 2*(.0207*.002));%m^2, area of pwr resistor
@@ -110,7 +110,7 @@ end
 pwrR_rod = P_in;%the power going into the rod is the power going into the last slice (which is the slice adjancent to the power resistor)
 pwrR_tot = 9*.6;%W, 9V*0.6A, this should equal the power loss plus the power in
 pwrFract  = pwrR_rod/(pwrR_tot);%fraction of power going into rod
-
+display(pwrFract);
 
 
 %%

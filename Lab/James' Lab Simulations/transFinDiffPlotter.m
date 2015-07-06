@@ -1,4 +1,4 @@
-[F, T] = transientFinDiffFuncNonLin(x, readings, tOffset, reading1, readingF, offsets2, amb1, Pin, eq, iceEnd, blackRod);
+[F, T] = transientFinDiffFuncNonLin(x, readings, tOffset, reading1, readingF, offsets2, amb1, Pin, eq, iceEnd, blackRod, moistRod);
 
 %% Calculate sum of errors squared.
 errsum = sum(sum(F.^2))

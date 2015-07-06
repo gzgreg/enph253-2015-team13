@@ -1,4 +1,4 @@
-function [F, T] = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, readingF, offsets2, amb1, Pin, eq, iceEnd, blackRod) 
+function [F, T] = transientFinDiffFuncNonLin(param, readings, tOffset, reading1, readingF, offsets2, amb1, Pin, eq, iceEnd, blackRod, moistRod) 
     %Finite difference calculations for aluminum rod transients
     %param meanings: 1=k, 2=kc, 3=eps, 4=kcEnd, 5=epsEnd, 6=c. Parameters 
     %that are not used in a particular scenario are
@@ -86,7 +86,10 @@ function [F, T] = transientFinDiffFuncNonLin(param, readings, tOffset, reading1,
             end
             Pconv = -S * (T(i, j) - Tamb) * kc;
             Prad = -eps * S * sigma * ((T(i, j) + 273.15)^4 - (Tamb+273.15)^4);
-            Ptot = Pcond + Pconv + Prad + P(i, j);        
+            Ptot = Pcond + Pconv + Prad + P(i, j);
+            if(j >= 12 && j < 19 && moistRod)
+                Ptot = Pcond + Pconv/2 + Prad - param(7) / 6 + P(i, j);
+            end
             P(i, j+1) = -Pcond;
             T(i+1, j) = Ptot*dt/(c*m) + T(i, j);
         end

@@ -104,7 +104,6 @@ for i = 2:nstep
  else
      
      if (x(i) < t4st && x(i) > t5end )
-           display(5)
            P_conv = moist_kc * 2 * pi * radius * dx *(T(i) - Tamb);
            P_rad = emsv_cloth * sigma * (2*pi*radius) * dx * (T(i)^4-Tamb^4);
            P_evap = fudgeE * dx * (T(i)-Tamb);

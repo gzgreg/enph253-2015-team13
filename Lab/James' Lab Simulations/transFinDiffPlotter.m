@@ -41,3 +41,8 @@ if(amb1)
 else
     legend(lines, '1', '2', '3','4', '5', 'ambient', 'Location', 'northwest');
 end
+
+xlabel('{\it t} (s)')
+ylabel('{\it T} (C)')
+set(gca, 'FontSize', 14)
+set(gca, 'FontName', 'Times New Roman')

@@ -4,7 +4,7 @@ readings = readings(:, [2 3 5 4 1 6], :); %mixed up sensors
 
 lb = [100 0 0.9999 0 0.9999 100];
 ub = [270 Inf 1 Inf 1 10000];
-x = [220 0 1 10 1 10000]; %initial guess
+x = [160 16 1 10 1 1600]; %initial guess
 offsets2 = [2.4477 3.1061 1.1222 3.9503 1.7317 0];
 %parameters: 1st is conduction constant, 2nd is convection inside tube,
 %3rd is emissivity inside tube, 4th is convection outside tube, 5th is

@@ -1,4 +1,5 @@
-[F, T] = transientFinDiffFuncNonLin(x, readings, tOffset, reading1, readingF, offsets2, amb1, Pin, eq, iceEnd, blackRod, moistRod);
+[F, T] = transientFinDiffFuncNonLin(x, readings, tOffset, reading1, readingF, ...
+    offsets2, amb1, Pin, eq, iceEnd, blackRod, moistRod);
 
 %% Calculate sum of errors squared.
 errsum = sum(sum(F.^2))
@@ -9,7 +10,7 @@ uncertainty = sqrt(errSumPer)
 %% Parameters of this fit: [k kcInner epsInner kcOuter epsOuter c]
 x
 
-%%
+%% Plot results.
 colors = 'kbmgrck';
 sensorPos = [1 6 9 12 19];
 factors = [1.79 1.81 1.53 1.46 2.06 2];
@@ -28,11 +29,13 @@ end
 figure(2);
 hold off
 for i=1:6
-    lines(i) = plot(squeeze(readings(3, i, :)), (squeeze(readings(1, i, :)) - offsets(i)) / factors(i) - offsets2(i), colors(i+1-amb1));
+    lines(i) = plot(squeeze(readings(3, i, :)), (squeeze(readings(1, i, :)) ...
+        - offsets(i)) / factors(i) - offsets2(i), colors(i+1-amb1));
     hold on
     if(i < 6)
         plot((1:length(T(:, i)))+tOffset, T(:, sensorPos(i)), colors(i+1));
-        if(i < 2); errorbar(length(T(:, i))+tOffset, T(length(T(:, i)), sensorPos(i)), uncertainty); end;
+        if(i < 2); errorbar(length(T(:, i))+tOffset, T(length(T(:, i)), ...
+                sensorPos(i)), uncertainty); end;
     end
 end
 hold off;

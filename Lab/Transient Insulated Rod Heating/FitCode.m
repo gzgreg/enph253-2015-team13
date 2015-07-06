@@ -15,7 +15,10 @@ Pin = 9.9;
 eq = 0;
 iceEnd = 0;
 blackRod = 0;
+moistRod = 0;
 %make sure readings are loaded here
-[x, errsum] = lsqnonlin(@(x)transientFinDiffFuncNonLin(x, readings, tOffset, reading1, readingF, offsets2, amb1, Pin, eq, iceEnd, blackRod, moistRod), x, lb, ub);
+[x, errsum] = lsqnonlin(@(x)transientFinDiffFuncNonLin(x, readings, tOffset, ...
+    reading1, readingF, offsets2, amb1, Pin, eq, iceEnd, blackRod, moistRod), ...
+    x, lb, ub);
 x
 errsum

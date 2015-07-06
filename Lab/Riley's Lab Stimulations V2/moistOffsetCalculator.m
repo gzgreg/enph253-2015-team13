@@ -9,9 +9,9 @@
 %Returns: a calibrated offset for each temp sensor
 
 %%
-function offset = offsetCalculator(transientDataFile,readRange,ambPin)
+function offset = moistOffsetCalculator(transientDataFile,readRange,ambPin)
 load(transientDataFile);
-calibratedData = Calibrate(readings(1,[2 4 5 6 3 1],:),1,readRange,ambPin);%calibrates data in readRange
+calibratedData = moistCalibrate(readings(1,:,:),1,readRange,ambPin);%calibrates data in readRange
 offset1 = 1:6;
 sensorDataC = 1:6;
 

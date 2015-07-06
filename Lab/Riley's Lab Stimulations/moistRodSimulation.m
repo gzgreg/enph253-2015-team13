@@ -51,12 +51,13 @@ t4st = h4 - width_tape/2;
 t5end = h5 + width_tape/2;
 
 %%
+ambPin = 1;
 readRangeStart = 1;
 readRangeEnd = 400;
 sensorDataC = 1:6;
 
-offset = offsetCalculator('June12MoistRodHeating',80,6);
-calibratedData = Calibrate(readings,readRangeStart,readRangeEnd,6);%calibrates data in reading range
+offset = offsetCalculator('June12MoistRodHeating',120,ambPin);
+calibratedData = Calibrate(readings,readRangeStart,readRangeEnd,ambPin);%calibrates data in reading range
 for i = 1:6
     sensorDataC(i) = mean(calibratedData(i,:)) + offset(i);%C, averages temperature at each sensor and applies additional offset
 end

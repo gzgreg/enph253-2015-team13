@@ -8,12 +8,12 @@
 %Returns: The temperature of each sensor
 
 %%
-function Tsensor = Calibrate(readings,rangeStart,rangeEnd,ambPin)
+function Tsensor = moistCalibrate(readings,rangeStart,rangeEnd,ambPin)
 
-pin = [2 4 5 6 3];%pins in order that are NOT the ambient temp pin
+pin = [2 3 4 5 6];%pins in order that are NOT the ambient temp pin
 Tsensor(1,:) = 0.4737*squeeze(readings(1,pin(1),rangeStart:rangeEnd)) - 1.02;
 
-Tsensor(2,:) = 0.4525*squeeze(readings(1,pin(2),rangeStart:rangeEnd)) + .8524;
+Tsensor(2,:) = 1.420*squeeze(readings(1,pin(2),rangeStart:rangeEnd)) + .8524;
 
 Tsensor(3,:) = 0.5492*squeeze(readings(1,pin(3),rangeStart:rangeEnd)) + 1.111;
 

@@ -21,7 +21,7 @@ dx = length/nstep;%m
 %Thermo constants
 k = 200; %W / (m * K) - conduction
 sigma = 5.67e-8;%W / (m^2 * K^4) stefan-boltzman const
-emsv = 0.95; %emissivity 
+emsv = 0.2; %emissivity 
 moist_kc = 5.0; %W / (m^2 * K)
 fudgeE = 1.5; %fudge factor for evaporation
 alpha = 1.9e-5;%m^2/s kinematic viscosity of air

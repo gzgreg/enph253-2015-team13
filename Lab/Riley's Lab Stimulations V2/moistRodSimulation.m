@@ -21,10 +21,10 @@ dx = length/nstep;%m
 %Thermo constants
 k = 200; %W / (m * K) - conduction
 sigma = 5.67e-8;%W / (m^2 * K^4) stefan-boltzman const
-emsv = 0.95; % emissivity
+emsv = 0.95; %emissivity 
 moist_kc = 5.0; %W / (m^2 * K)
-fudgeE = 2.0; %fudge factor for evaporation
-alpha = 1.9e-5;  %m^2/s kinematic viscosity of air
+fudgeE = 1.5; %fudge factor for evaporation
+alpha = 1.9e-5;%m^2/s kinematic viscosity of air
 g = 9.81; %m/s^2
 kc = 20.0; %W / (m^2 * K)
 emsv_elec_tape = 0.95;
@@ -32,7 +32,8 @@ emsv_cloth = 0.9;
 width_tape = .020;%m, width of the electrical tape
 pwrR_Area = ((15.5*20.7) + 2*(15.5*2) + 2*(20.7*2))*10^-6;%m^2, area of pwr resistor
 emsvR = 0.8;%emsivity of power resistor
-totalEvapPower = 0.0;
+latentHeatWaterEvap = 2260; %J/g
+totalEvapPowerLoss = 0.0; %0.0 Value is a placeholder until loop is exicuted
 %%
 
 %measurement points
@@ -109,7 +110,7 @@ for i = 2:nstep
            P_evap = fudgeE * dx * (T(i)-Tamb);
            P_loss = P_conv + P_rad + P_evap;
            
-           totalEvapPower = totalEvapPower + P_evap;
+           totalEvapPowerLoss = totalEvapPowerLoss + P_evap;
            
        else
    
@@ -147,7 +148,7 @@ ylabel('{\it T} (C)')
 set(gca, 'FontSize', 16)
 set(gca, 'FontName', 'TimesRoman')
 
-totalWaterEvap = totalEvapPower / 2260
-display(totalEvapPower)
+waterEvapPerSec = totalEvapPowerLoss / latentHeatWaterEvap %g/s
+display(totalEvapPowerLoss)%W
 
 

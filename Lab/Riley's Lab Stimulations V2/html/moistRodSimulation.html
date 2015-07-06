@@ -150,7 +150,6 @@ x(1) = dx;
  <span class="keyword">else</span>
 
      <span class="keyword">if</span> (x(i) &lt; t4st &amp;&amp; x(i) &gt; t5end )
-           display(5)
            P_conv = moist_kc * 2 * pi * radius * dx *(T(i) - Tamb);
            P_rad = emsv_cloth * sigma * (2*pi*radius) * dx * (T(i)^4-Tamb^4);
            P_evap = fudgeE * dx * (T(i)-Tamb);
@@ -170,71 +169,6 @@ x(1) = dx;
    dT = P_in * dx/(k * pi * radius^2);
    T(i) = T(i) + dT;
 <span class="keyword">end</span>
-</pre><pre class="codeoutput">
-ans =
-
-     5
-
-
-ans =
-
-     5
-
-
-ans =
-
-     5
-
-
-ans =
-
-     5
-
-
-ans =
-
-     5
-
-
-ans =
-
-     5
-
-
-ans =
-
-     5
-
-
-ans =
-
-     5
-
-
-ans =
-
-     5
-
-
-ans =
-
-     5
-
-
-ans =
-
-     5
-
-
-ans =
-
-     5
-
-
-ans =
-
-     5
-
 </pre><pre class="codeinput">pwrR_loss = emsvR * sigma * pwrR_Area *dx*(T(nstep)^4-Tamb^4) + kc * pwrR_Area * dx *(T(nstep) - Tamb);<span class="comment">%power loss from power resistor</span>
 pwrR_rod = P_in;<span class="comment">%the power going into the rod is the power going into the last slice (which is the slice adjancent to the power resistor)</span>
 pwrR_tot = 9*.6;<span class="comment">%W, 9V*0.6A, this should equal the power loss plus the power in</span>
@@ -383,7 +317,6 @@ for i = 2:nstep
  else
      
      if (x(i) < t4st && x(i) > t5end )
-           display(5)
            P_conv = moist_kc * 2 * pi * radius * dx *(T(i) - Tamb);
            P_rad = emsv_cloth * sigma * (2*pi*radius) * dx * (T(i)^4-Tamb^4);
            P_evap = fudgeE * dx * (T(i)-Tamb);

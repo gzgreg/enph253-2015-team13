@@ -39,7 +39,7 @@ void loop()
       delay(50);
       if(startbutton()){
         motor.speed(LEFT_MOTOR, 0);
-        motor.speed (RIGHT_MOTOR, 0);
+        motor.speed(RIGHT_MOTOR, 0);
         Menu();
       }
     }

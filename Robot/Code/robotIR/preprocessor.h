@@ -5,10 +5,13 @@
 
 #define LEFT_SENSOR 0
 #define RIGHT_SENSOR 1
-#define LEFT_IR 6
-#define RIGHT_IR 7
+#define LEFT_IR 4
+#define RIGHT_IR 5
 #define LEFT_MOTOR 1
 #define RIGHT_MOTOR 0
+#define ARM_BASE 2
+#define ARM_1 3
+#define ARM_2 4
 #define BUTTON_WAIT 200
 
 #include <avr/EEPROM.h>

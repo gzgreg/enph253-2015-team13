@@ -23,7 +23,7 @@ void loop()
   }
 
   errDeriv = (totalErr - prevErr) / (errTime + prevErrTime);
-  int correct = (PTape.Value * totalErr + DTape.Value * errDeriv);
+  int correct = (PTape.Value * totalErr - DTape.Value * errDeriv);
   if(correct > Speed.Value * 2) correct = Speed.Value * 2;
   if(correct < -Speed.Value * 2) correct = -Speed.Value * 2;
   

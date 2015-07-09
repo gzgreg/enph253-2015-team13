@@ -15,7 +15,7 @@ void loop()
   int leftErr = analogRead(LEFT_IR);
   int rightErr = analogRead(RIGHT_IR);
   
-  int totalErr = (leftErr - rightErr) / (leftErr + rightErr); //normalize
+  int totalErr = (leftErr - rightErr) * 100 / (leftErr + rightErr); //normalize
 
   if (totalErr != prevErr) {
     errTime = 0;
@@ -23,7 +23,7 @@ void loop()
   }
 
   errDeriv = (totalErr - prevErr) / (errTime + prevErrTime);
-  int correct = (PTape.Value * totalErr - DTape.Value * errDeriv);
+  int correct = (PIR.Value * totalErr - DIR.Value * errDeriv);
   if(correct > Speed.Value * 2) correct = Speed.Value * 2;
   if(correct < -Speed.Value * 2) correct = -Speed.Value * 2;
   
@@ -67,10 +67,10 @@ void loop()
     LCD.clear();
     LCD.home();
     char buffer[1024];
-    sprintf(buffer, "%d %d %d", leftErr, rightErr, PTape.Value);
+    sprintf(buffer, "%d %d %f %d", leftErr, rightErr, totalErr, PIR.Value);
     LCD.print(buffer);
     LCD.setCursor(0, 1);
-    sprintf(buffer, "%d %d %d", correct, leftMotor, rightMotor);
+    sprintf(buffer, "%d %d %d %d", correct, leftMotor, rightMotor, DIR.Value);
     LCD.print(buffer);
     i = 0;
   }

@@ -1,10 +1,10 @@
 #include <phys253.h>
 #include <LiquidCrystal.h>
-#define POTPIN 0
+#define POTPIN 7
 #define MOTPIN 0
 int loops = 0;
 int prevErr =0;
-int P=1,I=0,D=70;
+int P=2,I=0,D=70;
 int culErr =0;
 int t1,t2,dt;
 void setup() {
@@ -28,7 +28,7 @@ int error = analogRead(POTPIN) - knob(6);
 
 int motSpeed = (P*error + I*culErr - D*(error-prevErr)/dt );
 LCD.home();LCD.print(knob(6));
-LCD.setCursor(0,2);LCD.print(analogRead(POTPIN));
+LCD.setCursor(0,2);LCD.print(analogRead(POTPIN)*90.0/1023.0);
 LCD.setCursor(6,2);LCD.print(motSpeed);
 if(motSpeed<50 && motSpeed>10){motSpeed=50;}
 if(motSpeed>-50 && motSpeed<-10){motSpeed=-50;}

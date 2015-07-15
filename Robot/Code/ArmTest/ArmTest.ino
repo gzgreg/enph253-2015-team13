@@ -12,10 +12,8 @@ void setup()
 
 void loop()
 {   
-  moveArm(200, 100, 90);
+  moveArm(1000, 1000, 180);
   delay(1000);
-  moveArm(300, -1, -1);
-  delay(1000);
-  moveArm(-1, 60, 30);
+  moveArm(100, 100, 0);
   delay(1000);
 }

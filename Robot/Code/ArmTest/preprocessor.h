@@ -17,6 +17,7 @@
 #define ARM_ERROR 20
 #define ARM_PID_STOP 10
 #define ARM_PID_MIN 50
+#define ARM_TIME_LIMIT 3000
 #define BUTTON_WAIT 200
 
 #include <avr/EEPROM.h>
@@ -118,7 +119,19 @@ void armPID(int motor1, int value1, int motor2, int value2){
   unsigned long t2 = t1;
   unsigned long tInitial = t1;
   int dt = 0;
-  while((abs(error1) > ARM_ERROR || value1 == -1) && (abs(error2) > ARM_ERROR || value2 == -1)){
+  
+  if(error1 > ARM_ERROR){
+    motor.speed(ARM_BASE, 255);
+  } else if(error1 < -ARM_ERROR){
+    motor.speed(ARM_BASE, -255);
+  }
+  if(error2 > ARM_ERROR){
+    motor.speed(ARM_1, 255);
+  } else if(error2 < -ARM_ERROR){
+    motor.speed(ARM_1, -255);
+  }
+  delay(5);
+  while((abs(error1) > ARM_ERROR || value1 == -1) && (abs(error2) > ARM_ERROR || value2 == -1) && t2 - tInitial < ARM_TIME_LIMIT){
     dt = t2 - t1;
     if(abs(error1) > ARM_ERROR && value1 != -1){
       int motSp1 = (PArm.Value * error1 - DArm.Value * (error1 - prevErr1)/dt);

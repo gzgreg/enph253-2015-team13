@@ -135,10 +135,10 @@ void armPID(int motorb, int valueb, int motor1, int value1){
   int tThreshold = 100;
   int i = 0; //temp
   
-  while((tValid1 < tThreshold || value1 == -1) && (tValidb < tThreshold || valueb == -1) && t2 - tInitial < ARM_TIME_LIMIT){
+  while((tValid1 < tThreshold && value1 != -1) || (tValidb < tThreshold && valueb != -1) && t2 - tInitial < ARM_TIME_LIMIT){
     dt = t2 - t1;
     if(valueb != -1){
-      int motSpb = ((int32_t)PArm.Value * errorb / 8 - (int32_t)DArm.Value * (errorb - prevErrb)/dt + (int32_t)IArm.Value * errIntb / 128) / 256;
+      int motSpb = ((int32_t)PArm.Value * errorb / 8 - (int32_t)DArm.Value * (errorb - prevErrb)/dt + (int32_t)IArm.Value * errIntb / 1024) / 256;
       
       if(motSpb < ARM_PID_MIN_B && motSpb > ARM_PID_STOP){
         motSpb = ARM_PID_MIN_B; //clamp motor to minimum speed to produce movement
@@ -159,27 +159,12 @@ void armPID(int motorb, int valueb, int motor1, int value1){
       } else {
         tValidb = 0;
       }
-      
-      //temp
-      i = i+1;
-      if(i == 100){
-        i=0;
-        LCD.clear();
-        LCD.home();
-        char buffer[1024];
-        sprintf(buffer, "%d %d %d", valueb, analogRead(ARM_POT_BASE), motSpb);
-        LCD.print(buffer);
-        LCD.setCursor(0, 1);
-        sprintf(buffer, "%d %d %d", DArm.Value, PArm.Value, errorb);
-        LCD.print(buffer);
-      }
-      
-      
+     
       motor.speed(ARM_BASE, motSpb);
       prevErrb = errorb;
     }
     if(value1 != -1){
-      int motSp1 = ((int32_t)PArm1.Value * error1 / 64 - (int32_t)DArm1.Value * (error1 - prevErr1)/dt + (int32_t)IArm1.Value * errInt1 / 256);
+      int motSp1 = ((int32_t)PArm1.Value * error1 / 64 - (int32_t)DArm1.Value * (error1 - prevErr1)/dt + (int32_t)IArm1.Value * errInt1 / 1024);
       
       if(motSp1 < ARM_PID_MIN_1 && motSp1 > ARM_PID_STOP){
         motSp1 = ARM_PID_MIN_1;
@@ -201,6 +186,20 @@ void armPID(int motorb, int valueb, int motor1, int value1){
         tValid1 = 0;
       }
       
+      //temp
+      i = i+1;
+      if(i == 100){
+        i=0;
+        LCD.clear();
+        LCD.home();
+        char buffer[1024];
+        sprintf(buffer, "%d %d %d", value1, analogRead(ARM_POT_1), motSp1);
+        LCD.print(buffer);
+        LCD.setCursor(0, 1);
+        sprintf(buffer, "%d %d %d", DArm1.Value, PArm1.Value, error1);
+        LCD.print(buffer);
+      }
+      
       motor.speed(ARM_1, motSp1);
       prevErr1 = error1;
     }
@@ -212,8 +211,8 @@ void armPID(int motorb, int valueb, int motor1, int value1){
     errInt1 = errInt1 + error1;
     errIntb = errIntb + errorb;
     
-    if(errInt1 > 256) errInt1 = 256; else if(errInt1 < -256) errInt1 = -256;
-    if(errIntb > 256) errInt1 = 256; else if(errInt1 < -256) errInt1 = -256;
+    if(errInt1 > 10000) errInt1 = 10000; else if(errInt1 < -10000) errInt1 = -10000;
+    if(errIntb > 10000) errInt1 = 10000; else if(errInt1 < -10000) errInt1 = -10000;
   }
   
   motor.speed(ARM_POT_BASE, 0);

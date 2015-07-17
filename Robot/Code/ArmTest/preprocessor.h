@@ -54,9 +54,11 @@ MenuItem PIR = MenuItem("P-IR", 1023);
 MenuItem DIR = MenuItem("D-IR", 1023);
 MenuItem PArm = MenuItem("PArm-Base", 1023);
 MenuItem DArm = MenuItem("DArm-Base", 1023);
+MenuItem IArm = MenuItem("IArm-Base", 1023);
 MenuItem PArm1 = MenuItem("PArm-1", 1023);
 MenuItem DArm1 = MenuItem("DArm-1", 1023);
-MenuItem menuItems[] = {Speed, PTape, DTape, Thresh, PIR, DIR, PArm, DArm, PArm1, DArm1};
+MenuItem IArm1 = MenuItem("IArm-1", 1023);
+MenuItem menuItems[] = {Speed, PTape, DTape, Thresh, PIR, DIR, PArm, DArm, IArm, PArm1, DArm1, IArm1};
  
 void Menu(){
   LCD.clear(); LCD.home();
@@ -121,6 +123,8 @@ void armPID(int motorb, int valueb, int motor1, int value1){
   
   int prevErr1 = error1;
   int prevErrb = errorb;
+  int errIntb = error1;
+  int errInt1 = errorb;
   unsigned long t1 = millis();
   unsigned long t2 = t1;
   unsigned long tInitial = t1;
@@ -134,7 +138,7 @@ void armPID(int motorb, int valueb, int motor1, int value1){
   while((tValid1 < tThreshold || value1 == -1) && (tValidb < tThreshold || valueb == -1) && t2 - tInitial < ARM_TIME_LIMIT){
     dt = t2 - t1;
     if(valueb != -1){
-      int motSpb = ((int32_t)PArm.Value * errorb / 10 - (int32_t)DArm.Value * (errorb - prevErrb)/dt) / 200;
+      int motSpb = ((int32_t)PArm.Value * errorb / 8 - (int32_t)DArm.Value * (errorb - prevErrb)/dt + (int32_t)IArm.Value * errIntb / 128) / 256;
       
       if(motSpb < ARM_PID_MIN_B && motSpb > ARM_PID_STOP){
         motSpb = ARM_PID_MIN_B; //clamp motor to minimum speed to produce movement
@@ -175,7 +179,7 @@ void armPID(int motorb, int valueb, int motor1, int value1){
       prevErrb = errorb;
     }
     if(value1 != -1){
-      int motSp1 = ((int32_t)PArm1.Value * error1 / 64 - (int32_t)DArm1.Value * (error1 - prevErr1)/dt);
+      int motSp1 = ((int32_t)PArm1.Value * error1 / 64 - (int32_t)DArm1.Value * (error1 - prevErr1)/dt + (int32_t)IArm1.Value * errInt1 / 256);
       
       if(motSp1 < ARM_PID_MIN_1 && motSp1 > ARM_PID_STOP){
         motSp1 = ARM_PID_MIN_1;
@@ -205,6 +209,11 @@ void armPID(int motorb, int valueb, int motor1, int value1){
     t2 = millis();
     errorb = analogRead(ARM_POT_BASE) - valueb;
     error1 = analogRead(ARM_POT_1) - value1;
+    errInt1 = errInt1 + error1;
+    errIntb = errIntb + errorb;
+    
+    if(errInt1 > 256) errInt1 = 256; else if(errInt1 < -256) errInt1 = -256;
+    if(errIntb > 256) errInt1 = 256; else if(errInt1 < -256) errInt1 = -256;
   }
   
   motor.speed(ARM_POT_BASE, 0);

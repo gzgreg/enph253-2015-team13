@@ -9,15 +9,18 @@
 #define ARM_POT_1 3
 #define LEFT_IR 4
 #define RIGHT_IR 5
+#define L_MARK_SENSOR 6
+#define R_MARK_SENSOR 7
 #define LEFT_MOTOR 1
 #define RIGHT_MOTOR 0
 #define ARM_BASE 2
 #define ARM_1 3
 #define ARM_2 RCServo1
 #define ARM_ERROR 20
-#define ARM_PID_STOP 10
-#define ARM_PID_MIN 50
-#define ARM_TIME_LIMIT 3000
+#define ARM_PID_STOP 10 //value of arm motors that stops the motors
+#define ARM_PID_MIN_B 50 //minimum value of arm base motor
+#define ARM_PID_MIN_1 100 //minimum value of arm joint 1 motor
+#define ARM_TIME_LIMIT 3000 //time for arm to get into position
 #define BUTTON_WAIT 200
 
 #include <avr/EEPROM.h>
@@ -49,9 +52,11 @@ MenuItem DTape = MenuItem("D-Tape", 1023);
 MenuItem Thresh = MenuItem("Thresh-Tape", 1023);
 MenuItem PIR = MenuItem("P-IR", 1023);
 MenuItem DIR = MenuItem("D-IR", 1023);
-MenuItem PArm = MenuItem("PArm", 1023);
-MenuItem DArm = MenuItem("DArm", 1023);
-MenuItem menuItems[] = {Speed, PTape, DTape, Thresh, PIR, DIR, PArm, DArm};
+MenuItem PArm = MenuItem("PArm-Base", 1023);
+MenuItem DArm = MenuItem("DArm-Base", 1023);
+MenuItem PArm1 = MenuItem("PArm-1", 1023);
+MenuItem DArm1 = MenuItem("DArm-1", 1023);
+MenuItem menuItems[] = {Speed, PTape, DTape, Thresh, PIR, DIR, PArm, DArm, PArm1, DArm1};
  
 void Menu(){
   LCD.clear(); LCD.home();
@@ -61,17 +66,18 @@ void Menu(){
   while (true){
     /* Show MenuItem value and knob value */
     int menuIndex = knob(6) * (MenuItem::MenuItemCount) / 1024;
+    int val = map(knob(7), 0, 1024, 0, menuItems[menuIndex].Max + 1);
     LCD.clear(); LCD.home();
     LCD.print(menuItems[menuIndex].Name); LCD.print(" "); LCD.print(menuItems[menuIndex].Value);
     LCD.setCursor(0, 1);
-    LCD.print("Set to "); LCD.print(map(knob(7), 0, 1024, 0, menuItems[menuIndex].Max + 1)); LCD.print("?");
+    LCD.print("Set to "); LCD.print(val); LCD.print("?");
     delay(100);
  
     /* Press start button to save the new value */
     if (startbutton()){
       delay(50);
       if (startbutton()){
-        menuItems[menuIndex].Value = map(knob(7), 0, 1024, 0, menuItems[menuIndex].Max + 1);
+        menuItems[menuIndex].Value = val;
         menuItems[menuIndex].Save();
         delay(250);
       }
@@ -109,55 +115,98 @@ void moveArm(int base, int joint1, int joint2){
   joint2Angle = joint2;
 }
 
-void armPID(int motor1, int value1, int motor2, int value2){
+void armPID(int motorb, int valueb, int motor1, int value1){
   int error1 = analogRead(ARM_POT_BASE) - value1;
-  int error2 = analogRead(ARM_POT_1) - value2;
+  int errorb = analogRead(ARM_POT_1) - valueb;
   
   int prevErr1 = error1;
-  int prevErr2 = error2;
+  int prevErrb = errorb;
   unsigned long t1 = millis();
   unsigned long t2 = t1;
   unsigned long tInitial = t1;
   int dt = 0;
   
-  if(error1 > ARM_ERROR){
-    motor.speed(ARM_BASE, 255);
-  } else if(error1 < -ARM_ERROR){
-    motor.speed(ARM_BASE, -255);
-  }
-  if(error2 > ARM_ERROR){
-    motor.speed(ARM_1, 255);
-  } else if(error2 < -ARM_ERROR){
-    motor.speed(ARM_1, -255);
-  }
-  delay(5);
-  while((abs(error1) > ARM_ERROR || value1 == -1) && (abs(error2) > ARM_ERROR || value2 == -1) && t2 - tInitial < ARM_TIME_LIMIT){
+  int tValid1 = 0; //these track how long arm has been in valid range
+  int tValidb = 0;
+  int tThreshold = 100;
+  int i = 0; //temp
+  
+  while((tValid1 < tThreshold || value1 == -1) && (tValidb < tThreshold || valueb == -1) && t2 - tInitial < ARM_TIME_LIMIT){
     dt = t2 - t1;
-    if(abs(error1) > ARM_ERROR && value1 != -1){
-      int motSp1 = (PArm.Value * error1 - DArm.Value * (error1 - prevErr1)/dt);
+    if(valueb != -1){
+      int motSpb = ((int32_t)PArm.Value * errorb / 10 - (int32_t)DArm.Value * (errorb - prevErrb)/dt) / 200;
       
-      if(motSp1 < ARM_PID_MIN && motSp1 > ARM_PID_STOP){
-        motSp1 = ARM_PID_MIN;
+      if(motSpb < ARM_PID_MIN_B && motSpb > ARM_PID_STOP){
+        motSpb = ARM_PID_MIN_B; //clamp motor to minimum speed to produce movement
       }
-      if(motSp1 > -ARM_PID_MIN && motSp1 < -ARM_PID_STOP){
-        motSp1 = -ARM_PID_MIN;
+      if(motSpb > -ARM_PID_MIN_B && motSpb < -ARM_PID_STOP){
+        motSpb = -ARM_PID_MIN_B;
       }
-      motor.speed(ARM_BASE, motSp1);
+      
+      if(motSpb > 255){
+        motSpb = 255;
+      } else if(motSpb < -255){
+        motSpb = -255;
+      }
+      
+      if(abs(errorb) <= ARM_ERROR){
+        tValidb = tValidb + 1; //if arm within arm error for long enough, joint considered to be placed
+        motSpb = 0;
+      } else {
+        tValidb = 0;
+      }
+      
+      //temp
+      i = i+1;
+      if(i == 100){
+        i=0;
+        LCD.clear();
+        LCD.home();
+        char buffer[1024];
+        sprintf(buffer, "%d %d %d", valueb, analogRead(ARM_POT_BASE), motSpb);
+        LCD.print(buffer);
+        LCD.setCursor(0, 1);
+        sprintf(buffer, "%d %d %d", DArm.Value, PArm.Value, errorb);
+        LCD.print(buffer);
+      }
+      
+      
+      motor.speed(ARM_BASE, motSpb);
+      prevErrb = errorb;
+    }
+    if(value1 != -1){
+      int motSp1 = ((int32_t)PArm1.Value * error1 / 64 - (int32_t)DArm1.Value * (error1 - prevErr1)/dt);
+      
+      if(motSp1 < ARM_PID_MIN_1 && motSp1 > ARM_PID_STOP){
+        motSp1 = ARM_PID_MIN_1;
+      }
+      if(motSp1 > -ARM_PID_MIN_1 && motSp1 < -ARM_PID_STOP){
+        motSp1 = -ARM_PID_MIN_1;
+      }
+      
+      if(motSp1 > 255){
+        motSp1 = 255;
+      } else if(motSp1 < -255){
+        motSp1 = -255;
+      }
+      
+      if(abs(error1) <= ARM_ERROR){
+        tValid1 = tValid1 + 1;
+        motSp1 = 0;
+      } else {
+        tValid1 = 0;
+      }
+      
+      motor.speed(ARM_1, motSp1);
       prevErr1 = error1;
     }
-    if(abs(error2) > ARM_ERROR && value2 != -1){
-      int motSp2 = (PArm.Value * error2 - DArm.Value * (error2 - prevErr2)/dt);
-      
-      if(motSp2 < ARM_PID_MIN && motSp2 > ARM_PID_STOP){
-        motSp2 = ARM_PID_MIN;
-      }
-      if(motSp2 > -ARM_PID_MIN && motSp2 < -ARM_PID_STOP){
-        motSp2 = -ARM_PID_MIN;
-      }
-      motor.speed(ARM_1, motSp2);
-      prevErr2 = error2;
-    }
     t1 = t2;
+    
     t2 = millis();
+    errorb = analogRead(ARM_POT_BASE) - valueb;
+    error1 = analogRead(ARM_POT_1) - value1;
   }
+  
+  motor.speed(ARM_POT_BASE, 0);
+  motor.speed(ARM_1, 0);
 }

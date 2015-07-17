@@ -14,12 +14,25 @@ void loop()
 {   
   int leftErr = (analogRead(LEFT_SENSOR) < Thresh.Value) ? 1 : 0;
   int rightErr = (analogRead(RIGHT_SENSOR) < Thresh.Value) ? 1 : 0;
+  int leftMark = (analogRead(L_MARK_SENSOR) < Thresh.Value) ? 1 : 0;
+  int rightMark = (analogRead(R_MARK_SENSOR) < Thresh.Value) ? 1 : 0;
 
   int totalErr = leftErr - rightErr;
+  
   if (leftErr == 1 && rightErr == 1) {
     //off line: set error to be same sign as previous error
     if (prevErr < 0) totalErr = -3;
     if (prevErr >= 0) totalErr = 3;
+  }
+  
+  if(leftMark == 1){
+    if(rightMark == 1 || leftErr == 1 || rightErr == 1){
+      //on tape marking: do pet pickup
+    } else totalErr = 10;
+  } else if(rightMark == 1){
+    if(leftErr == 1 || rightErr == 1){
+      //on tape marking: do pet pickup
+    } else totalErr = -10;
   }
 
   if (totalErr != prevErr) {

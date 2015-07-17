@@ -12,8 +12,21 @@ void setup()
 
 void loop()
 {   
-  moveArm(1000, 1000, 180);
-  delay(1000);
-  moveArm(100, 100, 0);
-  delay(1000);
+  moveArm(400, 300, 180);
+  delay(500);
+  moveArm(800, 900, 0);
+  delay(500);
+  //LCD.clear(); LCD.home(); LCD.print("Waiting...");
+  //delay(10);
+  if(startbutton()){
+    delay(50);
+    if(startbutton()){
+      Menu();
+    }
+  }
+
+//  int val = map(knob(6), 0, 1024, -255, 256);
+//  motor.speed(3, val);
+//  LCD.clear(); LCD.home(); LCD.print(val);
+//  delay(20);
 }

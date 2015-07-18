@@ -18,9 +18,9 @@
 #define ARM_2 RCServo1
 #define ARM_ERROR 20
 #define ARM_PID_STOP 10 //value of arm motors that stops the motors
-#define ARM_PID_MIN_B 50 //minimum value of arm base motor
+#define ARM_PID_MIN_B 100 //minimum value of arm base motor
 #define ARM_PID_MIN_1 100 //minimum value of arm joint 1 motor
-#define ARM_TIME_LIMIT 3000 //time for arm to get into position
+#define ARM_TIME_LIMIT 5000 //time for arm to get into position
 #define BUTTON_WAIT 200
 
 #include <avr/EEPROM.h>
@@ -132,19 +132,25 @@ void armPID(int motorb, int valueb, int motor1, int value1){
   
   int tValid1 = 0; //these track how long arm has been in valid range
   int tValidb = 0;
-  int tThreshold = 100;
-  int i = 0; //temp
+  int tThreshold = 20;
+  int i = 99; //temp
   
-  while((tValid1 < tThreshold && value1 != -1) || (tValidb < tThreshold && valueb != -1) && t2 - tInitial < ARM_TIME_LIMIT){
+  while(((tValid1 < tThreshold && value1 != -1) || (tValidb < tThreshold && valueb != -1)) && t2 - tInitial < ARM_TIME_LIMIT){
     dt = t2 - t1;
+    errInt1 = errInt1 + error1;
+    errIntb = errIntb + errorb;
+    
+    if(errInt1 > 10000) errInt1 = 10000; else if(errInt1 < -10000) errInt1 = -10000;
+    if(errIntb > 10000) errIntb = 10000; else if(errIntb < -10000) errIntb = -10000;
     if(valueb != -1){
       int motSpb = ((int32_t)PArm.Value * errorb / 8 - (int32_t)DArm.Value * (errorb - prevErrb)/dt + (int32_t)IArm.Value * errIntb / 1024) / 256;
       
       if(motSpb < ARM_PID_MIN_B && motSpb > ARM_PID_STOP){
         motSpb = ARM_PID_MIN_B; //clamp motor to minimum speed to produce movement
-      }
-      if(motSpb > -ARM_PID_MIN_B && motSpb < -ARM_PID_STOP){
+      } else if(motSpb > -ARM_PID_MIN_B && motSpb < -ARM_PID_STOP){
         motSpb = -ARM_PID_MIN_B;
+      } else if(motSpb < ARM_PID_STOP && motSpb > -ARM_PID_STOP){
+        motSpb = 0;
       }
       
       if(motSpb > 255){
@@ -159,7 +165,7 @@ void armPID(int motorb, int valueb, int motor1, int value1){
       } else {
         tValidb = 0;
       }
-     
+
       motor.speed(ARM_BASE, motSpb);
       prevErrb = errorb;
     }
@@ -186,7 +192,7 @@ void armPID(int motorb, int valueb, int motor1, int value1){
         tValid1 = 0;
       }
       
-      //temp
+       //temp
       i = i+1;
       if(i == 100){
         i=0;
@@ -196,7 +202,7 @@ void armPID(int motorb, int valueb, int motor1, int value1){
         sprintf(buffer, "%d %d %d", value1, analogRead(ARM_POT_1), motSp1);
         LCD.print(buffer);
         LCD.setCursor(0, 1);
-        sprintf(buffer, "%d %d %d", DArm1.Value, PArm1.Value, error1);
+        sprintf(buffer, "%d %d %d", error1, tValid1, PArm1.Value);
         LCD.print(buffer);
       }
       
@@ -204,15 +210,9 @@ void armPID(int motorb, int valueb, int motor1, int value1){
       prevErr1 = error1;
     }
     t1 = t2;
-    
     t2 = millis();
     errorb = analogRead(ARM_POT_BASE) - valueb;
     error1 = analogRead(ARM_POT_1) - value1;
-    errInt1 = errInt1 + error1;
-    errIntb = errIntb + errorb;
-    
-    if(errInt1 > 10000) errInt1 = 10000; else if(errInt1 < -10000) errInt1 = -10000;
-    if(errIntb > 10000) errInt1 = 10000; else if(errInt1 < -10000) errInt1 = -10000;
   }
   
   motor.speed(ARM_POT_BASE, 0);

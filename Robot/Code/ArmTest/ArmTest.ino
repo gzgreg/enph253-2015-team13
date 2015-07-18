@@ -12,10 +12,14 @@ void setup()
 
 void loop()
 {   
-  moveArm(400, 300, 180);
+  moveArm(400, 900, 60);
   delay(500);
-  moveArm(800, 900, 0);
+  moveArm(800, 600, 0);
   delay(500);
+//  moveArm(-1, -1, 60);
+//  delay(500);
+//  moveArm(-1, -1, 0);
+//  delay(500);
   //LCD.clear(); LCD.home(); LCD.print("Waiting...");
   //delay(10);
   if(startbutton()){

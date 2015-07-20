@@ -6,8 +6,12 @@ volatile unsigned int INT_1 = 0;
 volatile unsigned int INT_2 = 0;
 volatile unsigned int INT_3 = 0;
  
-ISR(INT0_vect) {LCD.clear(); LCD.home(); LCD.print("INT0: "); LCD.print(INT_0++);};
-ISR(INT1_vect) {LCD.clear(); LCD.home(); LCD.print("INT1: "); LCD.print(INT_1++);};
+ISR(INT0_vect) {
+  leftRotations++;
+};
+ISR(INT1_vect){
+  rightRotations++;
+};
 ISR(INT2_vect) {LCD.clear(); LCD.home(); LCD.print("INT2: "); LCD.print(INT_2++);};
 ISR(INT3_vect) {LCD.clear(); LCD.home(); LCD.print("INT3: "); LCD.print(INT_3++);};
  

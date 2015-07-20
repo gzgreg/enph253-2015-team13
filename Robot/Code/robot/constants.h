@@ -17,6 +17,7 @@
 //digital inputs
 #define LEFT_ENCODER 0
 #define RIGHT_ENCODER 1
+#define ARM_END 2
 
 //motors
 #define LEFT_MOTOR 1

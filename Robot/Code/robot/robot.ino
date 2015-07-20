@@ -13,6 +13,12 @@ void setup()
   #include <phys253setup.txt>
   Serial.begin(9600);
   mode = 0;
+  petNum = 1;
+  leftRotations = 0;
+  rightRotations = 0;
+  
+  enableExternalInterrupt(INT0, RISING);
+  enableExternalInterrupt(INT1, RISING);
 }
 
 void loop()
@@ -30,6 +36,10 @@ void loop()
     }
   } else if(mode == 2){ //arm movement
     moveArm(-1, knob(6), map(knob(7), 0, 1024, 0, 180));
+    LCD.clear(); LCD.home();
+    char buffer[1024];
+    sprintf(buffer, "%d %d %d", baseAngle, joint1Angle, joint2Angle);
+    LCD.print(buffer);    
   } else if(mode == 3){ //IR follow
     irFollow();
   }

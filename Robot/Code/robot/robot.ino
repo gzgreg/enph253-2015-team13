@@ -16,6 +16,7 @@ void setup()
   petNum = 1;
   leftRotations = 0;
   rightRotations = 0;
+  onMarking = false;
   
   enableExternalInterrupt(INT0, RISING);
   enableExternalInterrupt(INT1, RISING);

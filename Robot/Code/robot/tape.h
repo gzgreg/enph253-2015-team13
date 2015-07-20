@@ -21,12 +21,26 @@ void tapeFollow(){
     
     if(leftMark == 1){
       if(rightMark == 1 || leftErr == 1 || rightErr == 1){
-        state = PET_PICKUP;
-      } else totalErr = 10;
+        if(!onMarking){
+          state = PET_PICKUP; //only switch state if not already on marking
+          onMarking = true;
+        }
+      } else {
+        totalErr = 10;
+        onMarking = false;
+      }
     } else if(rightMark == 1){
       if(leftErr == 1 || rightErr == 1){
-        state = PET_PICKUP;
-      } else totalErr = -10;
+        if(!onMarking){
+          state = PET_PICKUP;
+          onMarking = true;
+        }
+      } else {
+        totalErr = -10;
+        onMarking = false;
+      }
+    } else {
+      onMarking = false;
     }
   
     if (totalErr != prevErr) {

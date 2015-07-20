@@ -46,3 +46,4 @@ volatile unsigned int state;
 volatile unsigned int petNum;
 unsigned int leftRotations;
 unsigned int rightRotations;
+bool onMarking;

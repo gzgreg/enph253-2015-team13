@@ -6,6 +6,8 @@ void swingL();
 void swingR();
 void raise();
 void lower();
+void releasePet();
+void petPickup(int);
 
 /*
 Putting -1 into any parameter will cause that piece of the arm to stay stationary.
@@ -35,9 +37,9 @@ void armPID(int motorb, int valueb, int motor1, int value1){
   int tValid1 = 0; //these track how long arm has been in valid range
   int tValidb = 0;
   int tThreshold = 20;
-  int i = 99; //temp
+  int initState = state;
   
-  while(((tValid1 < tThreshold && value1 != -1) || (tValidb < tThreshold && valueb != -1)) && t2 - tInitial < ARM_TIME_LIMIT){
+  while(((tValid1 < tThreshold && value1 != -1) || (tValidb < tThreshold && valueb != -1)) && t2 - tInitial < ARM_TIME_LIMIT && state == initState){
     dt = t2 - t1;
     errInt1 = errInt1 + error1;
     errIntb = errIntb + errorb;
@@ -94,20 +96,6 @@ void armPID(int motorb, int valueb, int motor1, int value1){
         tValid1 = 0;
       }
       
-       //temp
-      i = i+1;
-      if(i == 100){
-        i=0;
-        LCD.clear();
-        LCD.home();
-        char buffer[1024];
-        sprintf(buffer, "%d %d %d", value1, analogRead(ARM_POT_1), motSp1);
-        LCD.print(buffer);
-        LCD.setCursor(0, 1);
-        sprintf(buffer, "%d %d %d", error1, tValid1, PArm1.Value);
-        LCD.print(buffer);
-      }
-      
       motor.speed(ARM_1, motSp1);
       prevErr1 = error1;
     }
@@ -132,4 +120,70 @@ void raise(){
 }
 void lower(){
   moveArm(-1, -1, joint2Angle - 10);
+}
+void releasePet(){
+  int ti = millis();
+  while(digitalRead(ARM_END) == 0 && millis() - ti < 3000){
+    ARM_RELEASE.write(180);
+    delay(100);
+    ARM_RELEASE.write(0);
+  }
+}
+
+void petPickup(int petNum){
+  static int beforeLoc[][20][3] = {
+                              {{200, 300, 0}, {400, 600, 180}}
+                            };
+  static int afterLoc[][20][3] = {
+                             {{400, 500, 60}, {200, 500, 180}}
+                            };
+  
+  int beforeLocCurr[20][3];
+  memcpy(beforeLocCurr, &beforeLoc[petNum - 1], 2*sizeof(*beforeLoc[petNum - 1]));
+  int afterLocCurr[20][3];
+  memcpy(afterLocCurr, &afterLoc[petNum - 1], 2*sizeof(*afterLoc[petNum - 1]));
+  
+  for(int i = 0; i < sizeof(beforeLocCurr) / sizeof(beforeLocCurr[0]); i++){
+    if(state == PET_DROPOFF) break;
+    moveArm(beforeLocCurr[i][0], beforeLocCurr[i][1], beforeLocCurr[i][2]);
+  }
+  
+  for(int i = 0; i < 5; i++){
+    if(state == PET_DROPOFF) break;
+    if(i%2 == 0){
+      for(int j = 0; j <= 5; j++){
+        swingL();
+        delay(200);
+        if(state == PET_DROPOFF) break;
+      }
+    } else {
+      for(int j = 0; j <= 5; j++){
+        swingR();
+        delay(200);
+        if(state == PET_DROPOFF) break;
+      }
+    }
+  }
+  
+  if(state == PET_DROPOFF){
+    for(int i = 0; i < sizeof(afterLocCurr) / sizeof(afterLocCurr[0]); i++){
+      moveArm(afterLocCurr[i][0], afterLocCurr[i][1], afterLocCurr[i][2]);
+    }
+    releasePet();
+  }
+  switch(petNum){
+    case 1:
+    case 2:
+    case 3:
+      state = TAPE_FOLLOW;
+      break;
+    case 4:
+    case 5:
+      state = IR_FOLLOW;
+      break;
+    case 6:
+      state = ZIPLINE;
+      break;
+  }
+  petNum++;
 }

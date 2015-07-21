@@ -16,7 +16,7 @@
 #define ARM_BASE 2
 #define ARM_1 3
 #define ARM_2 RCServo1
-#define ARM_ERROR 20
+#define ARM_ERROR 30
 #define ARM_PID_STOP 10 //value of arm motors that stops the motors
 #define ARM_PID_MIN_B 100 //minimum value of arm base motor
 #define ARM_PID_MIN_1 100 //minimum value of arm joint 1 motor
@@ -199,10 +199,10 @@ void armPID(int motorb, int valueb, int motor1, int value1){
         LCD.clear();
         LCD.home();
         char buffer[1024];
-        sprintf(buffer, "%d %d %d", value1, analogRead(ARM_POT_1), motSp1);
+        sprintf(buffer, "%d %d %d", value1, analogRead(ARM_POT_1), tValid1);
         LCD.print(buffer);
         LCD.setCursor(0, 1);
-        sprintf(buffer, "%d %d %d", error1, tValid1, PArm1.Value);
+        sprintf(buffer, "%d %d %d", valueb, analogRead(ARM_POT_BASE), tValidb);
         LCD.print(buffer);
       }
       

@@ -38,12 +38,14 @@
 #define TAPE_FOLLOW 0
 #define IR_FOLLOW 1
 #define PET_PICKUP 2
+#define PET_DROPOFF 3
+#define ZIPLINE 4
 
 unsigned int baseAngle;
 unsigned int joint1Angle;
 unsigned int joint2Angle;
 volatile unsigned int state;
 volatile unsigned int petNum;
-unsigned int leftRotations;
-unsigned int rightRotations;
+volatile unsigned int leftRotations;
+volatile unsigned int rightRotations;
 bool onMarking;

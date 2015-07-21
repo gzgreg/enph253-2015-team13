@@ -20,6 +20,16 @@ void setup()
   
   enableExternalInterrupt(INT0, RISING);
   enableExternalInterrupt(INT1, RISING);
+  enableExternalInterrupt(INT2, FALLING);
+  
+  int newMode;
+    while(!startbutton()){
+      LCD.clear(); LCD.home();
+      newMode = map(knob(6), 0, 1024, 1, 4);
+      LCD.print(newMode);
+      delay(50);
+    }
+    mode = newMode;
 }
 
 void loop()
@@ -43,6 +53,9 @@ void loop()
     LCD.print(buffer);    
   } else if(mode == 3){ //IR follow
     irFollow();
+  } else if(mode == 4){
+    petPickup(petNum);
+    delay(1000);
   }
   
   if(stopbutton()){

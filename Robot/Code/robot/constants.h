@@ -5,14 +5,14 @@
 #include "menu.h"
 
 //analog inputs
-#define LEFT_SENSOR 0
-#define RIGHT_SENSOR 1
-#define ARM_POT_BASE 2
-#define ARM_POT_1 3
-#define LEFT_IR 4
-#define RIGHT_IR 5
-#define L_MARK_SENSOR 6
-#define R_MARK_SENSOR 7
+#define L_MARK_SENSOR 0
+#define LEFT_SENSOR 1
+#define RIGHT_SENSOR 2
+#define R_MARK_SENSOR 3
+#define ARM_POT_BASE 4
+#define ARM_POT_1 5
+#define LEFT_IR 6
+#define RIGHT_IR 7
 
 //digital inputs
 #define LEFT_ENCODER 0
@@ -20,8 +20,8 @@
 #define ARM_END 2
 
 //motors
-#define LEFT_MOTOR 1
-#define RIGHT_MOTOR 0
+#define LEFT_MOTOR 0
+#define RIGHT_MOTOR 1
 #define ARM_BASE 2
 #define ARM_1 3
 #define ARM_2 RCServo0

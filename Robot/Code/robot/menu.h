@@ -33,7 +33,8 @@ MenuItem IArm = MenuItem("IArm-Base", 1023);
 MenuItem PArm1 = MenuItem("PArm-1", 1023);
 MenuItem DArm1 = MenuItem("DArm-1", 1023);
 MenuItem IArm1 = MenuItem("IArm-1", 1023);
-MenuItem menuItems[] = {Speed, PTape, DTape, Thresh, PIR, DIR, PArm, DArm, IArm, PArm1, DArm1, IArm1};
+MenuItem ITape = MenuItem("I-Tape", 1023);
+MenuItem menuItems[] = {Speed, PTape, DTape, Thresh, PIR, DIR, PArm, DArm, IArm, PArm1, DArm1, IArm1, ITape};
  
 void Menu(){
   LCD.clear(); LCD.home();

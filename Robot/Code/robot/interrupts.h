@@ -13,10 +13,7 @@ ISR(INT1_vect){
   rightRotations++;
 };
 ISR(INT2_vect) {
-  raise();
-  if(digitalRead(ARM_END)){
-    state = PET_DROPOFF;
-  }
+
 };
 ISR(INT3_vect) {LCD.clear(); LCD.home(); LCD.print("INT3: "); LCD.print(INT_3++);};
  

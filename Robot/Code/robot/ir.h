@@ -4,10 +4,11 @@ void irFollow();
 
 void irFollow(){
   int i = 0;
+  int leftErr = 0, rightErr = 0;
   while(state == IR_FOLLOW){
     int prevErr = 0, errTime = 1, prevErrTime = 0;
-    int leftErr = analogRead(LEFT_IR);
-    int rightErr = analogRead(RIGHT_IR);
+    leftErr = (analogRead(LEFT_IR) + leftErr*5) / 6;
+    rightErr = (analogRead(RIGHT_IR) + rightErr*5)/6;
     
     int totalErr = (leftErr - rightErr) * 100 / (leftErr + rightErr); //normalize
   
@@ -17,7 +18,7 @@ void irFollow(){
     }
   
     int errDeriv = (totalErr - prevErr) / (errTime + prevErrTime);
-    int correct = (PIR.Value * totalErr - DIR.Value * errDeriv);
+    int correct = (PIR.Value * totalErr + DIR.Value * errDeriv);
     if(correct > Speed.Value * 2) correct = Speed.Value * 2;
     if(correct < -Speed.Value * 2) correct = -Speed.Value * 2;
     
@@ -61,7 +62,7 @@ void irFollow(){
       LCD.clear();
       LCD.home();
       char buffer[1024];
-      sprintf(buffer, "%d %d %f %d", leftErr, rightErr, totalErr, PIR.Value);
+      sprintf(buffer, "%d %d %d %d", leftErr, rightErr, totalErr, PIR.Value);
       LCD.print(buffer);
       LCD.setCursor(0, 1);
       sprintf(buffer, "%d %d %d %d", correct, leftMotor, rightMotor, DIR.Value);

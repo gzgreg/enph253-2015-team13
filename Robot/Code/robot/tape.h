@@ -4,8 +4,11 @@ void tapeFollow();
 
 void tapeFollow(){
   int i = 0;
+  int errDeriv, prevErr = 0, dErr = 0, errTime = 1, prevErrTime = 0;
+  unsigned long 
+  lastMarkTime = millis();
+  int32_t errInt = 0;
   while(state == TAPE_FOLLOW){
-    int errDeriv, prevErr = 0, errTime = 1, prevErrTime = 0;
     int leftErr = (analogRead(LEFT_SENSOR) < Thresh.Value) ? 1 : 0;
     int rightErr = (analogRead(RIGHT_SENSOR) < Thresh.Value) ? 1 : 0;
     int leftMark = (analogRead(L_MARK_SENSOR) < Thresh.Value) ? 1 : 0;
@@ -15,28 +18,32 @@ void tapeFollow(){
     
     if (leftErr == 1 && rightErr == 1) {
       //off line: set error to be same sign as previous error
-      if (prevErr < 0) totalErr = -3;
-      if (prevErr >= 0) totalErr = 3;
+      if (prevErr < 0){
+        totalErr = -3;
+      }
+      if (prevErr >= 0){
+        totalErr = 3;
+      }
     }
     
-    if(leftMark == 1){
-      if(rightMark == 1 || leftErr == 1 || rightErr == 1){
-        if(!onMarking){
+    if(leftMark == 0){
+      if(rightMark == 0 || leftErr == 0 || rightErr == 0){
+        if(!onMarking && (millis() - lastMarkTime) > 2000){
           state = PET_PICKUP; //only switch state if not already on marking
           onMarking = true;
         }
       } else {
-        totalErr = 10;
+        totalErr = -10;
         onMarking = false;
       }
-    } else if(rightMark == 1){
-      if(leftErr == 1 || rightErr == 1){
-        if(!onMarking){
+    } else if(rightMark == 0){
+      if(leftErr == 0 || rightErr == 0){
+        if(!onMarking && (millis() - lastMarkTime) > 2000){
           state = PET_PICKUP;
           onMarking = true;
         }
       } else {
-        totalErr = -10;
+        totalErr = 10;
         onMarking = false;
       }
     } else {
@@ -46,10 +53,16 @@ void tapeFollow(){
     if (totalErr != prevErr) {
       errTime = 0;
       prevErrTime = errTime; //take slope from change before previous change
+      dErr = totalErr - prevErr;
     }
-  
-    errDeriv = (totalErr - prevErr) / (errTime + prevErrTime);
-    int correct = (PTape.Value * totalErr - DTape.Value * errDeriv);
+    
+    errDeriv = (int32_t)dErr * 100 * DTape.Value / (errTime + prevErrTime);
+    errInt = errInt + totalErr;
+    
+    if(errInt > 3000) errInt = 3000;
+    if(errInt < -3000) errInt = -3000;
+    
+    int correct = (PTape.Value * totalErr + errDeriv + errInt * ITape.Value / 10000);
     if(correct > Speed.Value * 2) correct = Speed.Value * 2;
     if(correct < -Speed.Value * 2) correct = -Speed.Value * 2;
     
@@ -93,10 +106,10 @@ void tapeFollow(){
       LCD.clear();
       LCD.home();
       char buffer[1024];
-      sprintf(buffer, "%d %d %d", Speed.Value, PTape.Value, DTape.Value);
+      sprintf(buffer, "%d %d %d", errInt, errInt * ITape.Value /10000, errTime+prevErrTime);
       LCD.print(buffer);
       LCD.setCursor(0, 1);
-      sprintf(buffer, "%d %d %d", correct, leftMotor, rightMotor);
+      sprintf(buffer, "%d %d %d", millis() - lastMarkTime, rightMark, correct);
       LCD.print(buffer);
       i = 0;
     }
@@ -105,6 +118,7 @@ void tapeFollow(){
     errTime = errTime + 1;
     i = i + 1;
   }
+  motor.stop_all();
 }
 
 

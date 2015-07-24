@@ -2,8 +2,8 @@
 
 void moveArm(int, int, int);
 void armPID(int, int, int, int);
-void swingL();
-void swingR();
+void swingL(int);
+void swingR(int);
 void raise();
 void lower();
 void releasePet();
@@ -103,71 +103,75 @@ void armPID(int motorb, int valueb, int motor1, int value1){
     t2 = millis();
     errorb = analogRead(ARM_POT_BASE) - valueb;
     error1 = analogRead(ARM_POT_1) - value1;
+    
+    if(!digitalRead(ARM_END) && initState == PET_PICKUP){
+      delay(50);
+      raise();
+      if(!digitalRead(ARM_END)){
+        state = PET_DROPOFF;
+      }
+    }
   }
   
   motor.speed(ARM_POT_BASE, 0);
   motor.speed(ARM_1, 0);
 }
 
-void swingL(){
-  moveArm(baseAngle + 60, -1, -1);
+void swingL(int dist){
+  moveArm(baseAngle + dist, -1, -1);
 }
-void swingR(){
-  moveArm(baseAngle - 60, -1, -1);
+void swingR(int dist){
+  moveArm(baseAngle - dist, -1, -1);
 }
 void raise(){
-  moveArm(-1, -1, joint2Angle + 10);
+  ARM_2.write(joint2Angle+30);
 }
 void lower(){
-  moveArm(-1, -1, joint2Angle - 10);
+  ARM_2.write(joint2Angle - 30);
 }
 void releasePet(){
-  int ti = millis();
-  while(digitalRead(ARM_END) == 0 && millis() - ti < 3000){
-    ARM_RELEASE.write(180);
-    delay(100);
-    ARM_RELEASE.write(0);
-  }
+  ARM_RELEASE.write(0);
+  delay(1000);
+  ARM_RELEASE.write(180);
 }
 
 void petPickup(int petNum){
-  static int beforeLoc[][20][3] = {
-                              {{200, 300, 0}, {400, 600, 180}}
+  static int beforeLoc[][1][3] = {
+                              {{470, 920, 0}},
+                              {{470, 920, 0}},
+                              {{283, 951, 95}},
+                              {{287, 945, 72}}                               
                             };
-  static int afterLoc[][20][3] = {
-                             {{400, 500, 60}, {200, 500, 180}}
+  static int afterLoc[][2][3] = {
+                             {{864, 377, 145}, {870, 582, 145}},
+                             {{864, 377, 145}, {870, 582, 145}},
+                             {{864, 377, 145}, {870, 582, 145}},
+                             {{864, 377, 145}, {870, 582, 145}},                      
                             };
-  
-  int beforeLocCurr[20][3];
-  memcpy(beforeLocCurr, &beforeLoc[petNum - 1], 2*sizeof(*beforeLoc[petNum - 1]));
-  int afterLocCurr[20][3];
-  memcpy(afterLocCurr, &afterLoc[petNum - 1], 2*sizeof(*afterLoc[petNum - 1]));
-  
-  for(int i = 0; i < sizeof(beforeLocCurr) / sizeof(beforeLocCurr[0]); i++){
+  int n = petNum - 1;
+  for(int i = 0; i < 1; i++){
     if(state == PET_DROPOFF) break;
-    moveArm(beforeLocCurr[i][0], beforeLocCurr[i][1], beforeLocCurr[i][2]);
+    moveArm(beforeLoc[n][i][0], beforeLoc[n][i][1], beforeLoc[n][i][2]);
   }
   
   for(int i = 0; i < 5; i++){
     if(state == PET_DROPOFF) break;
     if(i%2 == 0){
-      for(int j = 0; j <= 5; j++){
-        swingL();
-        delay(200);
-        if(state == PET_DROPOFF) break;
-      }
+      int temp;
+      if(i == 0) temp = 50; else temp = 100;
+      swingL(temp);
+      delay(200);
+      if(state == PET_DROPOFF) break;
     } else {
-      for(int j = 0; j <= 5; j++){
-        swingR();
-        delay(200);
-        if(state == PET_DROPOFF) break;
-      }
+      swingR(100);
+      delay(200);
+      if(state == PET_DROPOFF) break;
     }
   }
   
   if(state == PET_DROPOFF){
-    for(int i = 0; i < sizeof(afterLocCurr) / sizeof(afterLocCurr[0]); i++){
-      moveArm(afterLocCurr[i][0], afterLocCurr[i][1], afterLocCurr[i][2]);
+    for(int i = 0; i < 2; i++){
+      moveArm(afterLoc[n][i][0], afterLoc[n][i][1], afterLoc[n][i][2]);
     }
     releasePet();
   }

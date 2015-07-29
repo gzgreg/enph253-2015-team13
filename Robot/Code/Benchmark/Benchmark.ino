@@ -10,8 +10,13 @@ unsigned long tf;
 
 void setup()
 {
+<<<<<<< HEAD
   #include <phys253setup.txt>
   Serial.begin(9600);
+=======
+//  #include <phys253setup.txt>
+//  Serial.begin(9600);
+>>>>>>> 712cab93ef562321daa3bfa0842639beac2d5744
 //  
 //  i = 0;
 //  ti = micros();
@@ -34,11 +39,20 @@ void setup()
 //  LCD.home();
 //  LCD.print(dt);
 //  LCD.setCursor(0, 1);
+<<<<<<< HEAD
 //  LCD.print(dtFunc);
 //  
+=======
+//  LCD.print(dtFunc);  
+>>>>>>> 712cab93ef562321daa3bfa0842639beac2d5744
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+<<<<<<< HEAD
   motor.speed(0, knob(6));
+=======
+  LCD.clear(); LCD.home(); LCD.print(stopbutton());
+  delay(50);
+>>>>>>> 712cab93ef562321daa3bfa0842639beac2d5744
 }

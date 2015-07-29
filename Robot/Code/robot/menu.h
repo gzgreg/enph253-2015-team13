@@ -1,14 +1,3 @@
-//Include this file in all robot program folders.
-
-#include <phys253.h>
-#include <LiquidCrystal.h>
-
-#define LEFT_SENSOR 0
-#define RIGHT_SENSOR 1
-#define LEFT_MOTOR 1
-#define RIGHT_MOTOR 0
-#define BUTTON_WAIT 200
-
 #include <avr/EEPROM.h>
  
 class MenuItem{
@@ -38,7 +27,14 @@ MenuItem DTape = MenuItem("D-Tape", 1023);
 MenuItem Thresh = MenuItem("Thresh-Tape", 1023);
 MenuItem PIR = MenuItem("P-IR", 1023);
 MenuItem DIR = MenuItem("D-IR", 1023);
-MenuItem menuItems[] = {Speed, PTape, DTape, Thresh, PIR, DIR};
+MenuItem PArm = MenuItem("PArm-Base", 1023);
+MenuItem DArm = MenuItem("DArm-Base", 1023);
+MenuItem IArm = MenuItem("IArm-Base", 1023);
+MenuItem PArm1 = MenuItem("PArm-1", 1023);
+MenuItem DArm1 = MenuItem("DArm-1", 1023);
+MenuItem IArm1 = MenuItem("IArm-1", 1023);
+MenuItem ITape = MenuItem("I-Tape", 1023);
+MenuItem menuItems[] = {Speed, PTape, DTape, Thresh, PIR, DIR, PArm, DArm, IArm, PArm1, DArm1, IArm1, ITape};
  
 void Menu(){
   LCD.clear(); LCD.home();
@@ -48,17 +44,18 @@ void Menu(){
   while (true){
     /* Show MenuItem value and knob value */
     int menuIndex = knob(6) * (MenuItem::MenuItemCount) / 1024;
+    int val = map(knob(7), 0, 1024, 0, menuItems[menuIndex].Max + 1);
     LCD.clear(); LCD.home();
     LCD.print(menuItems[menuIndex].Name); LCD.print(" "); LCD.print(menuItems[menuIndex].Value);
     LCD.setCursor(0, 1);
-    LCD.print("Set to "); LCD.print(map(knob(7), 0, 1024, 0, menuItems[menuIndex].Max + 1)); LCD.print("?");
+    LCD.print("Set to "); LCD.print(val); LCD.print("?");
     delay(100);
  
     /* Press start button to save the new value */
     if (startbutton()){
       delay(50);
       if (startbutton()){
-        menuItems[menuIndex].Value = map(knob(7), 0, 1024, 0, menuItems[menuIndex].Max + 1);
+        menuItems[menuIndex].Value = val;
         menuItems[menuIndex].Save();
         delay(250);
       }

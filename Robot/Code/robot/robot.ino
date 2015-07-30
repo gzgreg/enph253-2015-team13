@@ -3,6 +3,7 @@
 #include "tape.h"
 #include "ir.h"
 #include "interrupts.h"
+#include "catapult.h"
 #include <phys253.h>
 #include <LiquidCrystal.h>
 
@@ -18,11 +19,13 @@ void setup()
   rightRotations = 0;
   onMarking = false;
   
-  enableExternalInterrupt(INT0, RISING);
-  enableExternalInterrupt(INT1, RISING);
+//  enableExternalInterrupt(INT0, RISING);
+//  enableExternalInterrupt(INT1, RISING);
   //enableExternalInterrupt(INT2, FALLING);
   
   ARM_RELEASE.write(180);
+  BASKET_RELEASE.write(180);
+  //moveArm(78, 900, 0); //initial arm position
   int newMode;
   while(!startbutton()){
     LCD.clear(); LCD.home();
@@ -31,7 +34,6 @@ void setup()
     delay(50);
   }
   mode = newMode;
-  //moveArm(78, 900, 0); //initial arm position
   state = TAPE_FOLLOW;
 }
 int j = 0; //temp
@@ -43,30 +45,47 @@ void loop()
         tapeFollow();
         j=0;
         break;
-      case PET_PICKUP:
-        motor.stop_all();
+      case PET_PICKUP: {
         delay(1000);
-        int currRotLeft = leftRotations;
-        int currRotRight = rightRotations;
-        while(leftRotations - currRotLeft < 4 && rightRotations - currRotRight < 4 && j == 0){
-          if(leftRotations - currRotLeft < 4) motor.speed(LEFT_MOTOR, -150);
-          if(rightRotations - currRotRight < 4) motor.speed(RIGHT_MOTOR, 150);
-          LCD.print(leftRotations - currRotLeft);
+        switch(petNum){
+          case 1:
+          case 2:
+            state = TAPE_FOLLOW;
+            encodedMotion(false, 4, false, 4);
+            break;
+          case 3:
+            state = CATAPULT;
+            break;
+          case 4:
+          case 5:
+            state = IR_FOLLOW;
+            encodedMotion(false, 4, false, 4);
+            break;
+          case 6:
+            state = ZIPLINE;
+            break;
         }
-        motor.stop_all();
-        LCD.clear(); LCD.home();
-        LCD.print(leftRotations);
-        LCD.setCursor(0, 1);
-        LCD.print(rightRotations);
-        j++;
-        
+        if(petNum == 4){
+          encodedMotion(true, 10, true, 10);
+          encodedMotion(true, 5, false, 0);
+          encodedMotion(true, 10, true, 10);
+        }
+        petNum++;
+        break;
+      }
+      case IR_FOLLOW:
+        irFollow();
+        j = 0;
+        break;
+      case CATAPULT:
+        fireCatapult();
         break;
     }
   } else if(mode == 2){ //arm movement
-    moveArm(-1, knob(6), map(knob(7), 0, 1024, 0, 180));
+    moveArm(-1, map(knob(6), 0, 1024, 400, 800), map(knob(7), 0, 1024, 0, 180));
     LCD.clear(); LCD.home();
     char buffer[1024];
-    sprintf(buffer, "%d %d %d", baseAngle, joint1Angle, joint2Angle);
+    sprintf(buffer, "%d %d %d", analogRead(ARM_POT_BASE), analogRead(ARM_POT_1) , joint2Angle);
     LCD.print(buffer);    
   } else if(mode == 3){ //IR follow
     state = IR_FOLLOW;
@@ -76,18 +95,28 @@ void loop()
     petPickup(petNum);
     delay(1000);
   } else if(mode == 5){
-    LCD.clear(); LCD.home(); LCD.print(digitalRead(ARM_END));
+    LCD.clear(); LCD.home(); LCD.print(analogRead(ARM_POT_1));
     delay(50);
   } else if(mode == 6){
-    motor.speed(LEFT_MOTOR, 150);
-    motor.speed(RIGHT_MOTOR, 150);
-    LCD.clear(); LCD.home(); LCD.print(leftRotations); LCD.setCursor(0, 1); LCD.print(rightRotations);
+    switch(state){
+      case TAPE_FOLLOW:
+        tapeFollow();
+        break;
+      case PET_PICKUP: {
+        LCD.clear(); LCD.home(); LCD.print(petNum);
+        encodedMotion(false, 4, false, 4);
+        petPickup(petNum);
+        break;
+      }
+      case CATAPULT:
+        fireCatapult();
+        break;
+      default:
+        LCD.clear(); LCD.home(); LCD.print(state);
+    }
   } else if(mode == 7){
-    LCD.clear(); LCD.home();
-    char buffer[1024];
-    sprintf(buffer, "%d %d %d %d", analogRead(L_MARK_SENSOR), analogRead(LEFT_SENSOR), analogRead(RIGHT_SENSOR), analogRead(R_MARK_SENSOR));
-    LCD.print(buffer);
-    delay(50);
+    state = CATAPULT;
+    fireCatapult();
   }
   if(stopbutton()){
     delay(50);

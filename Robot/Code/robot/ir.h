@@ -4,27 +4,27 @@ void irFollow();
 
 void irFollow(){
   int i = 0;
-  int leftErr = 0, rightErr = 0;
+  long leftErr = 0, rightErr = 0;
   while(state == IR_FOLLOW){
-    int prevErr = 0, errTime = 1, prevErrTime = 0;
+    long prevErr = 0, errTime = 1, prevErrTime = 0;
     leftErr = (analogRead(LEFT_IR) + leftErr*5) / 6;
     rightErr = (analogRead(RIGHT_IR) + rightErr*5)/6;
     
-    int totalErr = (leftErr - rightErr) * 100 / (leftErr + rightErr); //normalize
+    long totalErr = (rightErr - leftErr) * 100 / (leftErr + rightErr); //normalize
   
     if (totalErr != prevErr) {
       errTime = 0;
       prevErrTime = errTime; //take slope from change before previous change
     }
   
-    int errDeriv = (totalErr - prevErr) / (errTime + prevErrTime);
-    int correct = (PIR.Value * totalErr + DIR.Value * errDeriv);
-    if(correct > Speed.Value * 2) correct = Speed.Value * 2;
-    if(correct < -Speed.Value * 2) correct = -Speed.Value * 2;
+    long errDeriv = (totalErr - prevErr) / (errTime + prevErrTime);
+    long correct = (PIR.Value * totalErr + DIR.Value * errDeriv);
+    if(correct > Speed.Value) correct = Speed.Value;
+    if(correct < -Speed.Value) correct = -Speed.Value;
     
     int leftMotor, rightMotor;
-    leftMotor = (correct > 0) ? Speed.Value : Speed.Value + correct;
-    rightMotor = (correct < 0) ? -Speed.Value : -Speed.Value + correct;
+    leftMotor = (correct > 0) ? Speed.Value / 2 : Speed.Value / 2 + correct;
+    rightMotor = (correct < 0) ? -Speed.Value / 2 : -Speed.Value / 2 + correct;
     
     motor.speed(LEFT_MOTOR, leftMotor);
     motor.speed(RIGHT_MOTOR, rightMotor);

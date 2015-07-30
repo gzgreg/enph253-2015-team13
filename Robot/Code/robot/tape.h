@@ -5,9 +5,15 @@ void tapeFollow();
 void tapeFollow(){
   int i = 0;
   int errDeriv, prevErr = 0, dErr = 0, errTime = 1, prevErrTime = 0;
-  unsigned long 
-  lastMarkTime = millis();
+  unsigned long lastMarkTime = millis();
   int32_t errInt = 0;
+  int div;
+  switch(petNum){
+    case 2: 
+      div = 2;
+      break; 
+    default: div = 1;
+  }
   while(state == TAPE_FOLLOW){
     int leftErr = (analogRead(LEFT_SENSOR) < Thresh.Value) ? 1 : 0;
     int rightErr = (analogRead(RIGHT_SENSOR) < Thresh.Value) ? 1 : 0;
@@ -67,8 +73,8 @@ void tapeFollow(){
     if(correct < -Speed.Value * 2) correct = -Speed.Value * 2;
     
     int leftMotor, rightMotor;
-    leftMotor = (correct > 0) ? Speed.Value : Speed.Value + correct;
-    rightMotor = (correct < 0) ? -Speed.Value : -Speed.Value + correct;
+    leftMotor = (correct > 0) ? Speed.Value / div : (Speed.Value + correct) / div;
+    rightMotor = (correct < 0) ? -Speed.Value / div : (-Speed.Value + correct) / div;
     
     motor.speed(LEFT_MOTOR, leftMotor);
     motor.speed(RIGHT_MOTOR, rightMotor);
@@ -90,8 +96,8 @@ void tapeFollow(){
           motor.speed (RIGHT_MOTOR, 0);
           delay(BUTTON_WAIT);
           while(!stopbutton()){
-            int leftSensor = analogRead(LEFT_SENSOR);
-            int rightSensor = analogRead(RIGHT_SENSOR);
+            int leftSensor = analogRead(L_MARK_SENSOR);
+            int rightSensor = analogRead(R_MARK_SENSOR);
             LCD.clear();
             LCD.home();
             LCD.print(leftSensor);
@@ -106,7 +112,7 @@ void tapeFollow(){
       LCD.clear();
       LCD.home();
       char buffer[1024];
-      sprintf(buffer, "%d %d %d", errInt, errInt * ITape.Value /10000, errTime+prevErrTime);
+      sprintf(buffer, "%d %d %d", petNum, errInt * ITape.Value /10000, errTime+prevErrTime);
       LCD.print(buffer);
       LCD.setCursor(0, 1);
       sprintf(buffer, "%d %d %d", millis() - lastMarkTime, rightMark, correct);

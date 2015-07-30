@@ -98,6 +98,11 @@ void armPID(int motorb, int valueb, int motor1, int value1){
       
       motor.speed(ARM_1, motSp1);
       prevErr1 = error1;
+      
+      char buffer[1024];
+      sprintf(buffer, "%d %d %d", motSp1, error1, value1);
+      LCD.clear(); LCD.home(); LCD.print(buffer);
+      delay(20);
     }
     t1 = t2;
     t2 = millis();
@@ -111,6 +116,8 @@ void armPID(int motorb, int valueb, int motor1, int value1){
         state = PET_DROPOFF;
       }
     }
+    
+    
   }
   
   motor.speed(ARM_POT_BASE, 0);
@@ -178,8 +185,10 @@ void petPickup(int petNum){
   switch(petNum){
     case 1:
     case 2:
-    case 3:
       state = TAPE_FOLLOW;
+      break;
+    case 3:
+      state = CATAPULT;
       break;
     case 4:
     case 5:

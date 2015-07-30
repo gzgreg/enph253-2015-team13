@@ -26,12 +26,13 @@
 #define ARM_1 3
 #define ARM_2 RCServo0
 #define ARM_RELEASE RCServo1
+#define BASKET_RELEASE RCServo2
 
 //other constants
 #define ARM_ERROR 20 //permissible offset of arm from true value
 #define ARM_PID_STOP 10 //value of arm motors that stops the motors
 #define ARM_PID_MIN_B 100 //minimum value of arm base motor
-#define ARM_PID_MIN_1 100 //minimum value of arm joint 1 motor
+#define ARM_PID_MIN_1 150 //minimum value of arm joint 1 motor
 #define ARM_TIME_LIMIT 5000 //time for arm to get into position
 #define BUTTON_WAIT 200
 //states
@@ -40,12 +41,13 @@
 #define PET_PICKUP 2
 #define PET_DROPOFF 3
 #define ZIPLINE 4
+#define CATAPULT 5
 
 unsigned int baseAngle;
 unsigned int joint1Angle;
 unsigned int joint2Angle;
 volatile unsigned int state;
 volatile unsigned int petNum;
-volatile unsigned int leftRotations;
-volatile unsigned int rightRotations;
+volatile unsigned long leftRotations;
+volatile unsigned long rightRotations;
 bool onMarking;

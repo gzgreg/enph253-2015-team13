@@ -14,11 +14,16 @@ Putting -1 into any parameter will cause that piece of the arm to stay stationar
 base and joint1 take pot values, not angles. joint2 takes an angle. These should be found empirically
 */
 void moveArm(int base, int joint1, int joint2){
-  if(joint2 != -1) ARM_2.write(joint2);
+  if(joint2 != -1){
+    ARM_2.write(joint2);
+    if(base == -1 && joint1 == -1) delay(500);
+  }
   armPID(ARM_BASE, base, ARM_1, joint1);
-  baseAngle = analogRead(ARM_POT_BASE);
-  joint1Angle = analogRead(ARM_POT_1);
-  joint2Angle = joint2;
+  if(base != -1) baseAngle = analogRead(ARM_POT_BASE);
+  if(joint1 != -1) joint1Angle = analogRead(ARM_POT_1);
+  if(joint2 != -1){
+    joint2Angle = joint2;
+  }
 }
 
 void armPID(int motorb, int valueb, int motor1, int value1){
@@ -124,10 +129,18 @@ void swingR(int dist){
   moveArm(baseAngle - dist, -1, -1);
 }
 void raise(){
-  ARM_2.write(joint2Angle+30);
+  int newAngle;
+  if(joint2Angle < 60) newAngle = 0; else newAngle = joint2Angle - 60;
+  ARM_2.write(newAngle);
+  joint2Angle = newAngle;
+  delay(500);
 }
 void lower(){
-  ARM_2.write(joint2Angle - 30);
+  int newAngle;
+  if(joint2Angle > 120) newAngle = 180; else newAngle = joint2Angle + 60;
+  ARM_2.write(newAngle);
+  joint2Angle = newAngle;
+  delay(500);
 }
 void releasePet(){
   ARM_RELEASE.write(0);

@@ -74,7 +74,7 @@ void armPID(int motorb, int valueb, int motor1, int value1){
       prevErrb = errorb;
     }
     if(value1 != -1){
-      int motSp1 = ((int32_t)PArm1.Value * error1 / 64 - (int32_t)DArm1.Value * (error1 - prevErr1)/dt + (int32_t)IArm1.Value * errInt1 / 1024);
+      int motSp1 = ((int32_t)PArm1.Value * error1 / 1024 - (int32_t)DArm1.Value * (error1 - prevErr1)/dt + (int32_t)IArm1.Value * errInt1 / 1024);
       
       if(motSp1 < ARM_PID_MIN_1 && motSp1 > ARM_PID_STOP){
         motSp1 = ARM_PID_MIN_1;
@@ -98,11 +98,6 @@ void armPID(int motorb, int valueb, int motor1, int value1){
       
       motor.speed(ARM_1, motSp1);
       prevErr1 = error1;
-      
-      char buffer[1024];
-      sprintf(buffer, "%d %d %d", motSp1, error1, value1);
-      LCD.clear(); LCD.home(); LCD.print(buffer);
-      delay(20);
     }
     t1 = t2;
     t2 = millis();
@@ -116,8 +111,6 @@ void armPID(int motorb, int valueb, int motor1, int value1){
         state = PET_DROPOFF;
       }
     }
-    
-    
   }
   
   motor.speed(ARM_POT_BASE, 0);
@@ -143,59 +136,67 @@ void releasePet(){
 }
 
 void petPickup(int petNum){
-  static int beforeLoc[][1][3] = {
-                              {{470, 920, 0}},
-                              {{470, 920, 0}},
-                              {{283, 951, 95}},
-                              {{287, 945, 72}}                               
+  /* 
+    Basket: 483 182 0, -1 -1 180, 800 -1 150, -1 -1 100
+    Pet 1:183 625 55
+    Pet 2: same
+  */
+  static int beforeLoc[][2][3] = {
+                              {{166, 783, 0}, {-1, -1, 91}},
+                              {{148, 820, 0}, {-1, -1, 62}},
+                              {{318, 623, 172}, {-1, 724, -1}},
+                              {{287, 945, 108}, {-1, -1, -1}},
+                              {{-1, -1, -1}, {-1, -1, -1}},
+                              {{-1, -1, -1}, {-1, -1, -1}}                              
                             };
-  static int afterLoc[][2][3] = {
-                             {{864, 377, 145}, {870, 582, 145}},
-                             {{864, 377, 145}, {870, 582, 145}},
-                             {{864, 377, 145}, {870, 582, 145}},
-                             {{864, 377, 145}, {870, 582, 145}},                      
+  static int afterLoc[][4][3] = {
+                             {{445, 303, 180}, {-1, -1, -0}, {800, 300, 0}, {-1, -1, 95}},
+                             {{445, 303, 180}, {-1, -1, -0}, {800, 300, 0}, {-1, -1, 95}},
+                             {{445, 303, 180}, {-1, -1, -0}, {800, 300, 0}, {-1, -1, 95}},
+                             {{445, 303, 180}, {-1, -1, -0}, {800, 300, 0}, {-1, -1, 95}},
+                             {{445, 303, 180}, {-1, -1, -0}, {800, 300, 0}, {-1, -1, 95}},
+                             {{445, 303, 180}, {-1, -1, -0}, {800, 300, 0}, {-1, -1, 95}}              
                             };
   int n = petNum - 1;
-  for(int i = 0; i < 1; i++){
+  LCD.clear(); LCD.home(); LCD.print("Picking up pet");delay(50);
+  
+  for(int i = 0; i < 2; i++){
     if(state == PET_DROPOFF) break;
+    char buffer[1024]; sprintf(buffer, "Moving to %d", i); LCD.clear(); LCD.home(); LCD.print(buffer); delay(50);
     moveArm(beforeLoc[n][i][0], beforeLoc[n][i][1], beforeLoc[n][i][2]);
   }
-  
+  LCD.clear(); LCD.home(); LCD.print("Searching"); delay(50);
   for(int i = 0; i < 5; i++){
     if(state == PET_DROPOFF) break;
     if(i%2 == 0){
       int temp;
-      if(i == 0) temp = 50; else temp = 100;
+      if(i == 0) temp = 25; else temp = 50;
+      raise();
       swingL(temp);
-      delay(200);
+      lower();
       if(state == PET_DROPOFF) break;
     } else {
-      swingR(100);
-      delay(200);
+      raise();
+      swingR(50);
+      lower();
       if(state == PET_DROPOFF) break;
     }
   }
-  
-  if(state == PET_DROPOFF){
-    for(int i = 0; i < 2; i++){
-      moveArm(afterLoc[n][i][0], afterLoc[n][i][1], afterLoc[n][i][2]);
-    }
-    releasePet();
+  LCD.clear(); LCD.home(); LCD.print("Pet found"); delay(50);
+  for(int i = 0; i < 4; i++){
+    moveArm(afterLoc[n][i][0], afterLoc[n][i][1], afterLoc[n][i][2]);
   }
+  releasePet();
   switch(petNum){
     case 1:
+      state = TURN_AROUND;
     case 2:
-      state = TAPE_FOLLOW;
+      state = IR_FOLLOW_B;
       break;
     case 3:
-      state = CATAPULT;
-      break;
     case 4:
     case 5:
-      state = IR_FOLLOW;
-      break;
-    case 6:
-      state = ZIPLINE;
+      state = TAPE_FOLLOW_DOWN;
       break;
   }
   petNum++;

@@ -41,22 +41,33 @@ void setup()
 }
 void loop() {
   // put your main code here, to run repeatedly:
-  encodedMotion(true, 25, true, 25);
-  encodedMotion(false, 25, false, 25);
-  if(stopbutton()){
-    delay(10);
-    if(stopbutton()){
-      LCD.clear(); LCD.home(); LCD.print("Switching");
-      delay(300);
-      while(!stopbutton()){
-        LCD.clear(); LCD.home();
-        LCD.print(digitalRead(0));
-        LCD.setCursor(0, 1);
-        LCD.print(digitalRead(1));
-        delay(50);
-      }
-    }
-  }
+  
+  char buffer[1024];
+  sprintf(buffer, "%d %d %d %d", analogRead(0), analogRead(1), analogRead(2), analogRead(3));
+  LCD.clear(); LCD.home(); LCD.print(buffer);
+  LCD.setCursor(0, 1);
+  sprintf(buffer, "%d %d %d %d", analogRead(4), analogRead(5), analogRead(6), analogRead(7));
+  LCD.print(buffer);
+  delay(50);
+
+//  encodedMotion(true, 25, true, 25);
+//  encodedMotion(false, 25, false, 25);
+
+//  if(stopbutton()){
+//    delay(10);
+//    if(stopbutton()){
+//      LCD.clear(); LCD.home(); LCD.print("Switching");
+//      delay(300);
+//      while(!stopbutton()){
+//        LCD.clear(); LCD.home();
+//        LCD.print(digitalRead(0));
+//        LCD.setCursor(0, 1);
+//        LCD.print(digitalRead(1));
+//        delay(50);
+//      }
+//    }
+//  }
+
 //    int dig0 = digitalRead(0);
 //    int dig1 = digitalRead(1);
 //    LCD.clear(); LCD.home();
@@ -64,6 +75,8 @@ void loop() {
 //    sprintf(buffer, "%lu %lu %d %d %d", leftRotations, rightRotations, dig0, dig1, i);
 //    LCD.print(buffer);
 //    delay(50);
+
+//  RCServo0.write(map(knob(6), 0, 1024, 0, 181));
 }
 
 void encodedMotion(bool lForward, int lRot, bool rForward, int rRot){  

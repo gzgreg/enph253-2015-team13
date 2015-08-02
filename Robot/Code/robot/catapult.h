@@ -5,7 +5,7 @@ void encodedMotion(bool, int,  bool, int);
 
 void fireCatapult(){
   BASKET_RELEASE.write(0);
-  state = TAPE_FOLLOW;
+  state = TAPE_SEARCH;
 }
 
 void encodedMotion(bool lForward, int lRot, bool rForward, int rRot){
@@ -13,35 +13,35 @@ void encodedMotion(bool lForward, int lRot, bool rForward, int rRot){
   delay(500);
   int leftRotations = 0;
   int rightRotations = 0;
-  int lSpeed; if(lForward) lSpeed = 100; else lSpeed = -100;
-  int rSpeed; if(rForward) rSpeed = -100; else rSpeed = 100;
-  bool lOn = digitalRead(0);
-  bool rOn = digitalRead(1);
+  int lSpeed; if(lForward) lSpeed = ENCODE_SPD; else lSpeed = -ENCODE_SPD;
+  int rSpeed; if(rForward) rSpeed = -ENCODE_SPD; else rSpeed = ENCODE_SPD;
+  bool lOn = digitalRead(LEFT_ENCODER);
+  bool rOn = digitalRead(RIGHT_ENCODER);
   motor.speed(LEFT_MOTOR, lSpeed);
   motor.speed(RIGHT_MOTOR, rSpeed);
   while(leftRotations< lRot || rightRotations< rRot){
-    if(digitalRead(0) && !lOn){
+    if(digitalRead(LEFT_ENCODER) && !lOn){
       delay(20);
-      if(digitalRead(0)){
+      if(digitalRead(LEFT_ENCODER)){
         leftRotations++;
         if(leftRotations>= lRot) motor.speed(LEFT_MOTOR, 0);
       }
-    } else if(!digitalRead(0)){
+    } else if(!digitalRead(LEFT_ENCODER)){
       delay(20);
-      if(!digitalRead(0)){
+      if(!digitalRead(LEFT_ENCODER)){
         lOn = false;
       }
     }
     
-    if(digitalRead(1) && !rOn){
+    if(digitalRead(RIGHT_ENCODER) && !rOn){
       delay(20);
-      if(digitalRead(1)){
+      if(digitalRead(RIGHT_ENCODER)){
         rightRotations++;
         if(rightRotations >= rRot) motor.speed(RIGHT_MOTOR, 0);
       }
-    } else if(!digitalRead(1)){
+    } else if(!digitalRead(RIGHT_ENCODER)){
       delay(20);
-      if(!digitalRead(1)){
+      if(!digitalRead(RIGHT_ENCODER)){
         rOn = false;
       }
     }

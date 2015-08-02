@@ -1,6 +1,7 @@
 #include "constants.h"
 
 void tapeFollow();
+void tapeSearch();
 
 void tapeFollow(){
   int i = 0;
@@ -14,7 +15,7 @@ void tapeFollow(){
       break; 
     default: div = 1;
   }
-  while(state == TAPE_FOLLOW){
+  while(state == TAPE_FOLLOW_UP || state == TAPE_FOLLOW_DOWN){
     int leftErr = (analogRead(LEFT_SENSOR) < Thresh.Value) ? 1 : 0;
     int rightErr = (analogRead(RIGHT_SENSOR) < Thresh.Value) ? 1 : 0;
     int leftMark = (analogRead(L_MARK_SENSOR) < Thresh.Value) ? 1 : 0;
@@ -35,7 +36,13 @@ void tapeFollow(){
     if(leftMark == 0){
       if(rightMark == 0 || leftErr == 0 || rightErr == 0){
         if(!onMarking && (millis() - lastMarkTime) > 2000){
-          state = PET_PICKUP; //only switch state if not already on marking
+          passedMarkings++;
+          lastMarkTime = millis();
+          if(state == TAPE_FOLLOW_DOWN){
+            if(passedMarkings > 5) state = PET_PICKUP; //only switch state if not already on marking
+          } else {
+            if(passedMarkings == 4) state = IR_FOLLOW_F;
+          }
           onMarking = true;
         }
       } else {
@@ -45,7 +52,13 @@ void tapeFollow(){
     } else if(rightMark == 0){
       if(leftErr == 0 || rightErr == 0){
         if(!onMarking && (millis() - lastMarkTime) > 2000){
-          state = PET_PICKUP;
+          passedMarkings++;
+          lastMarkTime = millis();
+          if(state == TAPE_FOLLOW_DOWN){
+            if(passedMarkings > 5) state = PET_PICKUP; //only switch state if not already on marking
+          } else {
+            if(passedMarkings == 4) state = IR_FOLLOW_F;
+          }
           onMarking = true;
         }
       } else {
@@ -84,7 +97,7 @@ void tapeFollow(){
         delay(50);
         if(startbutton()){
           motor.speed(LEFT_MOTOR, 0);
-          motor.speed (RIGHT_MOTOR, 0);
+          motor.speed(RIGHT_MOTOR, 0);
           Menu();
         }
       }
@@ -108,16 +121,6 @@ void tapeFollow(){
         }
         delay(BUTTON_WAIT);
       }
-      
-      LCD.clear();
-      LCD.home();
-      char buffer[1024];
-      sprintf(buffer, "%d %d %d", petNum, errInt * ITape.Value /10000, errTime+prevErrTime);
-      LCD.print(buffer);
-      LCD.setCursor(0, 1);
-      sprintf(buffer, "%d %d %d", millis() - lastMarkTime, rightMark, correct);
-      LCD.print(buffer);
-      i = 0;
     }
     
     prevErr = totalErr;
@@ -127,4 +130,27 @@ void tapeFollow(){
   motor.stop_all();
 }
 
+void tapeSearch(){
+  unsigned long currTime = millis();
+  unsigned long initTime = currTime;
+  unsigned long switchTime = currTime + 600;
+  bool left = true;
+  while(analogRead(LEFT_SENSOR) < Thresh.Value && analogRead(RIGHT_SENSOR) < Thresh.Value && millis() - initTime < 2000){
+    if(left){
+      motor.speed(LEFT_MOTOR, -70);
+      motor.speed(RIGHT_MOTOR, -70);
+    } else {
+      motor.speed(LEFT_MOTOR, 70);
+      motor.speed(RIGHT_MOTOR, 70);
+    }
+    if(millis() > switchTime){
+      left = !left;
+      currTime = millis();
+      switchTime = currTime + 1200;
+    }
+  }
+  motor.speed(LEFT_MOTOR, 0);
+  motor.speed(RIGHT_MOTOR, 0);
+  state = TAPE_FOLLOW_DOWN;
+}
 

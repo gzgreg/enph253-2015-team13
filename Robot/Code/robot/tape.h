@@ -41,7 +41,7 @@ void tapeFollow(){
           if(state == TAPE_FOLLOW_DOWN){
             if(passedMarkings > 5) state = PET_PICKUP; //only switch state if not already on marking
           } else {
-            if(passedMarkings == 4) state = IR_FOLLOW_F;
+            if(passedMarkings == 4) state = IR_FOLLOW_F; //TODO: also check for encoding
           }
           onMarking = true;
         }
@@ -57,7 +57,7 @@ void tapeFollow(){
           if(state == TAPE_FOLLOW_DOWN){
             if(passedMarkings > 5) state = PET_PICKUP; //only switch state if not already on marking
           } else {
-            if(passedMarkings == 4) state = IR_FOLLOW_F;
+            if(passedMarkings == 4) state = IR_FOLLOW_F; //TODO: also check for encoding
           }
           onMarking = true;
         }
@@ -121,6 +121,7 @@ void tapeFollow(){
         }
         delay(BUTTON_WAIT);
       }
+      LCD.clear(); LCD.home(); LCD.print(passedMarkings); delay(10);
     }
     
     prevErr = totalErr;

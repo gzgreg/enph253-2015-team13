@@ -35,9 +35,9 @@ void loop()
       case TAPE_FOLLOW_DOWN:
         tapeFollow();
         break;
-      case PET_PICKUP: {
+      case PET_PICKUP: 
         petPickup(petNum);
-      }
+        break;
       case IR_FOLLOW_F:
       case IR_FOLLOW_B:
         irFollow();

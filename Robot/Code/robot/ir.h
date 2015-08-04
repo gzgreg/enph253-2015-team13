@@ -9,7 +9,7 @@ void irFollow(){
   bool rOn = digitalRead(1);
   int leftRotations = 0;
   int rightRotations = 0;
-  while(state == IR_FOLLOW_F || state == IR_FOLLOW_F){
+  while(state == IR_FOLLOW_F || state == IR_FOLLOW_B){
     long prevErr = 0, errTime = 1, prevErrTime = 0;
     leftErr = (analogRead(LEFT_IR) + leftErr*5) / 6;
     rightErr = (analogRead(RIGHT_IR) + rightErr*5)/6;
@@ -59,10 +59,10 @@ void irFollow(){
     }
     
     if(state == IR_FOLLOW_F){
-      //check IR magnitude and encoding to find distance to box
+      //check IR magnitude and encoding to find distance to box (or front bumper)
     }
     if(state == IR_FOLLOW_B){
-      if(analogRead(LEFT_SENSOR) <= Thresh.Value || analogRead(RIGHT_SENSOR) <= Thresh.Value){
+      if(analogRead(LEFT_SENSOR) <= Thresh.Value || analogRead(RIGHT_SENSOR) <= Thresh.Value){ //add distance check: which goes into tape search mode
         state == TAPE_FOLLOW_DOWN;
       }
       //check tape and distance to fifth pet

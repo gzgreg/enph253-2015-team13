@@ -35,7 +35,7 @@ void armPID(int motorb, int valueb, int motor1, int value1){
   int errIntb = error1;
   int errInt1 = errorb;
   unsigned long t1 = millis();
-  unsigned long t2 = t1;
+  unsigned long t2 = t1 + 1000;
   unsigned long tInitial = t1;
   int dt = 0;
   
@@ -45,6 +45,14 @@ void armPID(int motorb, int valueb, int motor1, int value1){
   int initState = state;
   
   while(((tValid1 < tThreshold && value1 != -1) || (tValidb < tThreshold && valueb != -1)) && t2 - tInitial < ARM_TIME_LIMIT && state == initState){
+    if(!digitalRead(ARM_END) && initState == PET_PICKUP){
+      delay(50);
+      raise();
+      if(!digitalRead(ARM_END)){
+        state = PET_DROPOFF;
+        break;
+      }
+    }
     dt = t2 - t1;
     errInt1 = errInt1 + error1;
     errIntb = errIntb + errorb;
@@ -108,14 +116,6 @@ void armPID(int motorb, int valueb, int motor1, int value1){
     t2 = millis();
     errorb = analogRead(ARM_POT_BASE) - valueb;
     error1 = analogRead(ARM_POT_1) - value1;
-    
-    if(!digitalRead(ARM_END) && initState == PET_PICKUP){
-      delay(50);
-      raise();
-      if(!digitalRead(ARM_END)){
-        state = PET_DROPOFF;
-      }
-    }
   }
   
   motor.speed(ARM_POT_BASE, 0);
@@ -155,12 +155,12 @@ void petPickup(int petNum){
     Pet 2: same
   */
   static int beforeLoc[][2][3] = {
-                              {{166, 783, 0}, {-1, -1, 91}},
-                              {{148, 820, 0}, {-1, -1, 62}},
-                              {{318, 623, 172}, {-1, 724, -1}},
-                              {{287, 945, 108}, {-1, -1, -1}},
-                              {{-1, -1, -1}, {-1, -1, -1}},
-                              {{-1, -1, -1}, {-1, -1, -1}}                              
+                              {{166, 783, 0}, {-1, -1, 91}}, //pet 1
+                              {{148, 820, 0}, {-1, -1, 62}}, //pet 2
+                              {{318, 623, 172}, {-1, 724, -1}}, //pet 3
+                              {{287, 945, 108}, {-1, -1, -1}}, //pet 4
+                              {{-1, -1, -1}, {-1, -1, -1}}, // pet 5
+                              {{-1, -1, -1}, {-1, -1, -1}} //pet 6
                             };
   static int afterLoc[][4][3] = {
                              {{445, 303, 180}, {-1, -1, -0}, {800, 300, 0}, {-1, -1, 95}},
@@ -184,14 +184,10 @@ void petPickup(int petNum){
     if(i%2 == 0){
       int temp;
       if(i == 0) temp = 25; else temp = 50;
-      raise();
       swingL(temp);
-      lower();
       if(state == PET_DROPOFF) break;
     } else {
-      raise();
       swingR(50);
-      lower();
       if(state == PET_DROPOFF) break;
     }
   }

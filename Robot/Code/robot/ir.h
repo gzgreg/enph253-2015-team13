@@ -13,6 +13,7 @@ void irFollow(){
     long prevErr = 0, errTime = 1, prevErrTime = 0;
     leftErr = (analogRead(LEFT_IR) + leftErr*5) / 6;
     rightErr = (analogRead(RIGHT_IR) + rightErr*5)/6;
+    rightErr = rightErr * 2;
     
     long totalErr = (rightErr - leftErr) * 100 / (leftErr + rightErr); //normalize
   
@@ -22,7 +23,7 @@ void irFollow(){
     }
   
     long errDeriv = (totalErr - prevErr) / (errTime + prevErrTime);
-    long correct = (PIR.Value * totalErr + DIR.Value * errDeriv);
+    long correct = -(PIR.Value * totalErr + DIR.Value * errDeriv);
     if(correct > Speed.Value) correct = Speed.Value;
     if(correct < -Speed.Value) correct = -Speed.Value;
     
@@ -60,12 +61,22 @@ void irFollow(){
     
     if(state == IR_FOLLOW_F){
       //check IR magnitude and encoding to find distance to box (or front bumper)
+      if(digitalRead(FRONT_BUMPER)){
+        delay(50);
+        if(digitalRead(FRONT_BUMPER)){
+          state = PET_PICKUP;
+          break;
+        }
+      }
     }
     if(state == IR_FOLLOW_B){
       if(analogRead(LEFT_SENSOR) <= Thresh.Value || analogRead(RIGHT_SENSOR) <= Thresh.Value){ //add distance check: which goes into tape search mode
         state == TAPE_FOLLOW_DOWN;
       }
-      //check tape and distance to fifth pet
+      if((leftRotations+rightRotations) / 2 >= 100 && petNum == 2){
+        delay(2000); //change to PET_PICKUP state
+        petNum++;
+      }
     }
     
     if(i == 100){
@@ -110,6 +121,7 @@ void irFollow(){
     
     prevErr = totalErr;
     errTime = errTime + 1;
+    rightErr = rightErr / 2;
     i = i + 1;
   }
 }

@@ -18,7 +18,7 @@
 #define LEFT_ENCODER 0
 #define RIGHT_ENCODER 1
 #define ARM_END 2
-#define FRONT_BUMPER 3
+#define FRONT_BUMPER 3  
 
 //motors
 #define LEFT_MOTOR 0
@@ -27,7 +27,6 @@
 #define ARM_1 3
 #define ARM_2 RCServo0
 #define ARM_RELEASE RCServo1
-#define BASKET_RELEASE RCServo2
 
 //other constants
 #define ARM_ERROR 20 //permissible offset of arm from true value

@@ -21,22 +21,22 @@ void setup()
 //  enableExternalInterrupt(INT1, RISING);
   //enableExternalInterrupt(INT2, FALLING);
   
-  ARM_RELEASE.write(180);
-  BASKET_RELEASE.write(180);
-  moveArm(90, 711, 177); //initial arm position
+  ARM_RELEASE.write(0);
+  moveArm(814, 646, 177); //initial arm position
   selectMode();
 }
 void loop()
 {
   if(mode == 1){ //marking detection
-    LCD.clear(); LCD.home(); LCD.print(state);
+    //LCD.clear(); LCD.home(); LCD.print(state);
     switch(state){
       case TAPE_FOLLOW_UP:
       case TAPE_FOLLOW_DOWN:
         tapeFollow();
         break;
       case PET_PICKUP: 
-        petPickup(petNum);
+        //petPickup(petNum);
+        petNum++;
         break;
       case IR_FOLLOW_F:
       case IR_FOLLOW_B:
@@ -56,7 +56,7 @@ void loop()
     LCD.clear(); LCD.home();
     char buffer[1024];
     sprintf(buffer, "%d %d %d", analogRead(ARM_POT_BASE), analogRead(ARM_POT_1) , joint2Angle);
-    LCD.print(buffer);    
+    LCD.print(buffer);
   } else if(mode == 3){ //IR follow
     state = IR_FOLLOW_F;
     irFollow();
@@ -69,44 +69,28 @@ void loop()
   } else if(mode == 6){
     switch(state){
       case TAPE_FOLLOW_UP:
+      case TAPE_FOLLOW_DOWN:
         tapeFollow();
         break;
-      case PET_PICKUP: {
-        delay(1000);
-        switch(petNum){
-          case 1:
-            encodedMotion(false, 4, false, 4);
-            break;
-          case 3:
-            break;
-          case 4:
-          case 5:
-            encodedMotion(false, 4, false, 4);
-            break;
-          case 6:
-            break;
-        }
-        if(petNum == 4){
-          encodedMotion(true, 10, true, 10);
-          encodedMotion(true, 5, false, 0);
-          encodedMotion(true, 10, true, 10);
-        }
-        petNum++;
+      case PET_PICKUP:
         selectMode();
         break;
-      }
-      case CATAPULT:
-        fireCatapult();
+      case IR_FOLLOW_F:
+      case IR_FOLLOW_B:
+        irFollow();
         break;
       case TAPE_SEARCH:
         tapeSearch();
         break;
-      default:
-        LCD.clear(); LCD.home(); LCD.print(state);
-    }
+      case TURN_AROUND:
+        encodedMotion(false, 4, false, 4);
+        encodedMotion(true, 16, false, 16);
+        state = IR_FOLLOW_B;
+        break;
+    } 
   } else if(mode == 7){
-    state = CATAPULT;
-    fireCatapult();
+     releasePet();
+     delay(1000);
   }
   if(stopbutton()){
     delay(50);
@@ -133,7 +117,10 @@ void selectMode(){
     delay(50);
   }
   mode = newMode;
-  if(mode == 1) state = TAPE_FOLLOW_UP;
+  if(mode == 1){
+    state = TAPE_FOLLOW_UP;
+    passedMarkings = 0;
+  }
   if(mode == 6){
     int newPetNum;
     while(!stopbutton()){
@@ -142,7 +129,9 @@ void selectMode(){
       LCD.print(newPetNum); 
       delay(50);
     }
+    while(stopbutton()){}
     petNum = newPetNum;
     state = TAPE_SEARCH;
+    passedMarkings = 5;
   }
 }

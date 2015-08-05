@@ -9,8 +9,8 @@ void tapeFollow(){
   unsigned long lastMarkTime = millis();
   int32_t errInt = 0;
   int div;
-  switch(petNum){
-    case 2: 
+  switch(state){
+    case TAPE_FOLLOW_DOWN: 
       div = 2;
       break; 
     default: div = 1;
@@ -20,6 +20,7 @@ void tapeFollow(){
     int rightErr = (analogRead(RIGHT_SENSOR) < Thresh.Value) ? 1 : 0;
     int leftMark = (analogRead(L_MARK_SENSOR) < Thresh.Value) ? 1 : 0;
     int rightMark = (analogRead(R_MARK_SENSOR) < Thresh.Value) ? 1 : 0;
+    unsigned long currTime = millis();
   
     int totalErr = leftErr - rightErr;
     
@@ -34,32 +35,53 @@ void tapeFollow(){
     }
     
     if(leftMark == 0){
-      if(rightMark == 0 || leftErr == 0 || rightErr == 0){
-        if(!onMarking && (millis() - lastMarkTime) > 2000){
+      if(rightMark == 0 || leftErr == 0 || rightErr == 0 || totalErr > 0){
+        if(!onMarking && (currTime - lastMarkTime) > 1500 && (passedMarkings >= 6 || passedMarkings == 4)){
           passedMarkings++;
-          lastMarkTime = millis();
+          lastMarkTime = currTime;
           if(state == TAPE_FOLLOW_DOWN){
             if(passedMarkings > 5) state = PET_PICKUP; //only switch state if not already on marking
-          } else {
-            if(passedMarkings == 4) state = IR_FOLLOW_F; //TODO: also check for encoding
           }
           onMarking = true;
+          switch(passedMarkings){
+            case 7:
+              div = 2;
+              break;
+            case 8:
+              div = 1;
+              break;
+          }
         }
       } else {
         totalErr = -10;
         onMarking = false;
       }
     } else if(rightMark == 0){
-      if(leftErr == 0 || rightErr == 0){
-        if(!onMarking && (millis() - lastMarkTime) > 2000){
+      if(leftErr == 0 || rightErr == 0 || totalErr < 0){
+        if(!onMarking && (currTime - lastMarkTime) > 1500 && (passedMarkings <= 3 || passedMarkings == 5)){
           passedMarkings++;
-          lastMarkTime = millis();
+          lastMarkTime = currTime;
           if(state == TAPE_FOLLOW_DOWN){
             if(passedMarkings > 5) state = PET_PICKUP; //only switch state if not already on marking
           } else {
-            if(passedMarkings == 4) state = IR_FOLLOW_F; //TODO: also check for encoding
+            if(passedMarkings == 4){
+              motor.stop_all();
+              state = TURN_AROUND; //TODO: also check for encoding
+              break;
+            }
           }
           onMarking = true;
+          switch(passedMarkings){
+            case 1:
+              div = 2;
+              break;
+            case 2:
+              div = 1;
+              break;
+            case 6:
+              div = 2;
+              break;
+          }
         }
       } else {
         totalErr = 10;
@@ -121,7 +143,7 @@ void tapeFollow(){
         }
         delay(BUTTON_WAIT);
       }
-      LCD.clear(); LCD.home(); LCD.print(passedMarkings); delay(10);
+      i = 0;
     }
     
     prevErr = totalErr;
@@ -135,7 +157,7 @@ void tapeSearch(){
   unsigned long currTime = millis();
   unsigned long initTime = currTime;
   unsigned long switchTime = currTime + 600;
-  bool left = true;
+  bool left = false;
   while(analogRead(LEFT_SENSOR) < Thresh.Value && analogRead(RIGHT_SENSOR) < Thresh.Value && millis() - initTime < 2000){
     if(left){
       motor.speed(LEFT_MOTOR, -70);

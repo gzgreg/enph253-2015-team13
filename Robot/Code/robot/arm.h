@@ -4,8 +4,8 @@ void moveArm(int, int, int);
 void armPID(int, int, int, int);
 void swingL(int);
 void swingR(int);
-void raise();
-void lower();
+void raise(int);
+void lower(int);
 void releasePet();
 void petPickup(int);
 
@@ -24,6 +24,7 @@ void moveArm(int base, int joint1, int joint2){
   if(joint2 != -1){
     joint2Angle = joint2;
   }
+  motor.stop_all();
 }
 
 void armPID(int motorb, int valueb, int motor1, int value1){
@@ -42,12 +43,11 @@ void armPID(int motorb, int valueb, int motor1, int value1){
   int tValid1 = 0; //these track how long arm has been in valid range
   int tValidb = 0;
   int tThreshold = 20;
-  int initState = state;
   
-  while(((tValid1 < tThreshold && value1 != -1) || (tValidb < tThreshold && valueb != -1)) && t2 - tInitial < ARM_TIME_LIMIT && state == initState){
-    if(!digitalRead(ARM_END) && initState == PET_PICKUP){
+  while(((tValid1 < tThreshold && value1 != -1) || (tValidb < tThreshold && valueb != -1)) && t2 - tInitial < ARM_TIME_LIMIT){
+    if(!digitalRead(ARM_END) && state == PET_PICKUP && petNum != 1){
       delay(50);
-      raise();
+      raise(100);
       if(!digitalRead(ARM_END)){
         state = PET_DROPOFF;
         break;
@@ -128,24 +128,20 @@ void swingL(int dist){
 void swingR(int dist){
   moveArm(baseAngle - dist, -1, -1);
 }
-void raise(){
+void raise(int angle){
   int newAngle;
-  if(joint2Angle < 60) newAngle = 0; else newAngle = joint2Angle - 60;
-  ARM_2.write(newAngle);
-  joint2Angle = newAngle;
-  delay(500);
+  if(joint2Angle < angle + 40) newAngle = 0; else newAngle = joint2Angle - angle;
+  moveArm(-1, newAngle, -1);
 }
-void lower(){
+void lower(int angle){
   int newAngle;
-  if(joint2Angle > 120) newAngle = 180; else newAngle = joint2Angle + 60;
-  ARM_2.write(newAngle);
-  joint2Angle = newAngle;
-  delay(500);
+  if(joint2Angle > 1000 - angle) newAngle = 1000; else newAngle = joint2Angle + angle;
+  moveArm(-1, newAngle, -1);
 }
 void releasePet(){
-  ARM_RELEASE.write(0);
+  ARM_RELEASE.write(75);
   delay(1000);
-  ARM_RELEASE.write(180);
+  ARM_RELEASE.write(0);
 }
 
 void petPickup(int petNum){
@@ -179,7 +175,7 @@ void petPickup(int petNum){
     moveArm(beforeLoc[n][i][0], beforeLoc[n][i][1], beforeLoc[n][i][2]);
   }
   LCD.clear(); LCD.home(); LCD.print("Searching"); delay(50);
-  for(int i = 0; i < 5; i++){
+  for(int i = 0; i < 7; i++){
     if(state == PET_DROPOFF) break;
     if(i%2 == 0){
       int temp;
@@ -189,6 +185,7 @@ void petPickup(int petNum){
     } else {
       swingR(50);
       if(state == PET_DROPOFF) break;
+      lower(60);
     }
   }
   LCD.clear(); LCD.home(); LCD.print("Pet found"); delay(50);

@@ -34,7 +34,7 @@ MenuItem PArm1 = MenuItem("PArm-1", 1023);
 MenuItem DArm1 = MenuItem("DArm-1", 1023);
 MenuItem IArm1 = MenuItem("IArm-1", 1023);
 MenuItem ITape = MenuItem("I-Tape", 1023);
-MenuItem* menuItems[] = {&Speed, &PTape, &DTape, &Thresh, &PIR, &DIR, &PArm, &DArm, &IArm, &PArm1, &DArm1, &IArm1, &ITape};
+MenuItem menuItems[] = {Speed, PTape, DTape, Thresh, PIR, DIR, PArm, DArm, IArm, PArm1, DArm1, IArm1, ITape};
  
 void Menu(){
   LCD.clear(); LCD.home();
@@ -44,9 +44,9 @@ void Menu(){
   while (true){
     /* Show MenuItem value and knob value */
     int menuIndex = knob(6) * (MenuItem::MenuItemCount) / 1024;
-    int val = map(knob(7), 0, 1024, 0, menuItems[menuIndex]->Max + 1);
+    int val = map(knob(7), 0, 1024, 0, menuItems[menuIndex].Max + 1);
     LCD.clear(); LCD.home();
-    LCD.print(menuItems[menuIndex]->Name); LCD.print(" "); LCD.print(menuItems[menuIndex]->Value);
+    LCD.print(menuItems[menuIndex].Name); LCD.print(" "); LCD.print(menuItems[menuIndex].Value);
     LCD.setCursor(0, 1);
     LCD.print("Set to "); LCD.print(val); LCD.print("?");
     delay(100);
@@ -55,8 +55,8 @@ void Menu(){
     if (startbutton()){
       delay(50);
       if (startbutton()){
-        menuItems[menuIndex]->Value = val;
-        menuItems[menuIndex]->Save();
+        menuItems[menuIndex].Value = val;
+        menuItems[menuIndex].Save();
         delay(250);
       }
     }

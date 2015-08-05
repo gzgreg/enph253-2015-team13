@@ -1,12 +1,6 @@
 #include "constants.h"
 
-void fireCatapult();
 void encodedMotion(bool, int,  bool, int);
-
-void fireCatapult(){
-  BASKET_RELEASE.write(0);
-  state = TAPE_SEARCH;
-}
 
 void encodedMotion(bool lForward, int lRot, bool rForward, int rRot){
   motor.stop_all();

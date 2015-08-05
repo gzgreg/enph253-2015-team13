@@ -46,9 +46,10 @@ void loop()
         tapeSearch();
         break;
       case TURN_AROUND:
+        encodedMotion(true, 6, true, 4);
         encodedMotion(false, 4, false, 4);
         encodedMotion(true, 8, false, 8);
-        state = IR_FOLLOW_B;
+        state = TAPE_SEARCH;
         break;
     }
   } else if(mode == 2){ //arm movement

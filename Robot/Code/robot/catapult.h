@@ -1,4 +1,5 @@
 #include "constants.h"
+#pragma once
 
 void encodedMotion(bool, int,  bool, int);
 
@@ -11,16 +12,18 @@ void encodedMotion(bool lForward, int lRot, bool rForward, int rRot){
   int rSpeed; if(rForward) rSpeed = -ENCODE_SPD; else rSpeed = ENCODE_SPD;
   bool lOn = digitalRead(LEFT_ENCODER);
   bool rOn = digitalRead(RIGHT_ENCODER);
+  unsigned long initTime = millis();
   motor.speed(LEFT_MOTOR, lSpeed);
   motor.speed(RIGHT_MOTOR, rSpeed);
-  while(leftRotations< lRot || rightRotations< rRot){
+  while(leftRotations< lRot || rightRotations< rRot || (millis() - initTime) > 4000){
     if(digitalRead(LEFT_ENCODER) && !lOn){
       delay(20);
       if(digitalRead(LEFT_ENCODER)){
         leftRotations++;
         if(leftRotations>= lRot) motor.speed(LEFT_MOTOR, 0);
+        lOn = true;
       }
-    } else if(!digitalRead(LEFT_ENCODER)){
+    } else if(!digitalRead(LEFT_ENCODER) && lOn){
       delay(20);
       if(!digitalRead(LEFT_ENCODER)){
         lOn = false;
@@ -32,8 +35,9 @@ void encodedMotion(bool lForward, int lRot, bool rForward, int rRot){
       if(digitalRead(RIGHT_ENCODER)){
         rightRotations++;
         if(rightRotations >= rRot) motor.speed(RIGHT_MOTOR, 0);
+        rOn = true;
       }
-    } else if(!digitalRead(RIGHT_ENCODER)){
+    } else if(!digitalRead(RIGHT_ENCODER) && rOn){
       delay(20);
       if(!digitalRead(RIGHT_ENCODER)){
         rOn = false;

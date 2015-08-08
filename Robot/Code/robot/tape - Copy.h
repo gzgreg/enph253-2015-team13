@@ -2,12 +2,18 @@
 #include "catapult.h"
 
 void tapeFollow();
-void tapeSearch(bool, int);
+void tapeSearch(bool);
+void measureQRD(int, int, int*);
+void measureQRD(int pin, int threshold, int* value){
+  *value = 3*(*value) + (analogRead(pin) < threshold)*10;
+  *value /= 4;
+}
 
 void tapeFollow(){
   int i = 0;
   int errDeriv, prevErr = 0, dErr = 0, errTime = 1, prevErrTime = 0;
   unsigned long lastMarkTime = millis();
+  int leftErrCount = 0, rightErrCount = 0;
   int32_t errInt = 0;
   bool tapeEnd = false;
   int div;
@@ -17,27 +23,25 @@ void tapeFollow(){
       break; 
     default: div = 1;
   }
+  int leftErr = (analogRead(LEFT_SENSOR) < Thresh.Value);
+  int rightErr = (analogRead(RIGHT_SENSOR) < Thresh.Value);
   while(state == TAPE_FOLLOW_UP || state == TAPE_FOLLOW_DOWN){
-    int leftErr = (analogRead(LEFT_SENSOR) < Thresh.Value);
-    int rightErr = (analogRead(RIGHT_SENSOR) < Thresh.Value);
+    measureQRD(LEFT_SENSOR, Thresh.Value, &leftErr);
+    measureQRD(RIGHT_SENSOR, Thresh.Value, &rightErr);
     int leftMark = (analogRead(L_MARK_SENSOR) < Thresh.Value);
     int rightMark = (analogRead(R_MARK_SENSOR) < Thresh.Value);
     unsigned long currTime = millis();
     
-    int totalErr = leftErr - rightErr;
-    
-    if (leftErr == 1 && rightErr == 1) {
-      //off line: set error to be same sign as previous error
-      if (prevErr < 0){
-        totalErr = -3;
-      }
-      if (prevErr >= 0){
-        totalErr = 3;
-      }
-      if(tapeEnd){
-        state = TURN_AROUND;
-        break;
-      }
+    int totalErr;
+    if(leftErr + rightErr >= 9){
+      totalErr = (prevErr > 0) ? 1 : -1;
+      totalErr = totalErr * 14;
+    } else if(leftErr == rightErr){
+      totalErr = 0;
+    } else if(leftErr > rightErr){
+      totalErr = leftErr;
+    } else {
+      totalErr = -rightErr;
     }
     
     if(leftMark == 0){
@@ -48,6 +52,7 @@ void tapeFollow(){
               passedMarkings++;
               lastMarkTime = currTime;
               if(state == TAPE_FOLLOW_DOWN){
+                if(passedMarkings > 5) state = PET_PICKUP; //only switch state if not already on marking
               } else {
                 if(passedMarkings == 4){
                   tapeEnd = true;
@@ -78,10 +83,7 @@ void tapeFollow(){
               passedMarkings++;
               lastMarkTime = currTime;
               if(state == TAPE_FOLLOW_DOWN){
-              } else {
-                if(passedMarkings == 4){
-                  tapeEnd = true;
-                }
+                if(passedMarkings > 5) state = PET_PICKUP; //only switch state if not already on marking
               }
               onMarking = true;
               switch(passedMarkings){
@@ -90,8 +92,8 @@ void tapeFollow(){
                   break;
                 case 2:
                   div = 1;
-                  encodedMotion(true, 3, true, 13);
-                  tapeSearch(true, TAPE_FOLLOW_UP);
+                  encodedMotion(true, 5, true, 9);
+                  tapeSearch(true);
                   break;
                 case 6:
                   div = 2;
@@ -107,7 +109,6 @@ void tapeFollow(){
     } else {
       onMarking = false;
     }
-    
     if (totalErr != prevErr) {
       errTime = 0;
       prevErrTime = errTime; //take slope from change before previous change
@@ -148,16 +149,11 @@ void tapeFollow(){
           while(!stopbutton()){
             int leftSensor = analogRead(LEFT_SENSOR);
             int rightSensor = analogRead(RIGHT_SENSOR);
-            int lMarkSensor = analogRead(L_MARK_SENSOR);
-            int rMarkSensor = analogRead(R_MARK_SENSOR);
             LCD.clear();
             LCD.home();
-            char buffer[1024];
-            sprintf(buffer, "%d %d", leftSensor, rightSensor);
-            LCD.print(buffer);
+            LCD.print(leftSensor);
             LCD.setCursor(0, 1);
-            sprintf(buffer, "%d %d", lMarkSensor, rMarkSensor);
-            LCD.print(buffer);
+            LCD.print(rightSensor);
             delay(50);
           }  
         }
@@ -176,11 +172,11 @@ void tapeFollow(){
   motor.stop_all();
 }
 
-void tapeSearch(bool left, int stat){
+void tapeSearch(bool left){
   unsigned long currTime = millis();
   unsigned long initTime = currTime;
-  unsigned long switchTime = currTime + 1000;
-  while(analogRead(LEFT_SENSOR) < Thresh.Value && analogRead(RIGHT_SENSOR) < Thresh.Value && millis() - initTime < 3500){
+  unsigned long switchTime = currTime + 600;
+  while(analogRead(LEFT_SENSOR) < Thresh.Value && analogRead(RIGHT_SENSOR) < Thresh.Value && millis() - initTime < 2000){
     if(left){
       motor.speed(LEFT_MOTOR, -SEARCH_SPD);
       motor.speed(RIGHT_MOTOR, -SEARCH_SPD);
@@ -191,11 +187,10 @@ void tapeSearch(bool left, int stat){
     if(millis() > switchTime){
       left = !left;
       currTime = millis();
-      switchTime = currTime + 2000;
+      switchTime = currTime + 1200;
     }
   }
   motor.speed(LEFT_MOTOR, 0);
   motor.speed(RIGHT_MOTOR, 0);
-  state = stat;
+  state = TAPE_FOLLOW_DOWN;
 }
-

@@ -34,7 +34,8 @@
 #define ARM_PID_MIN_B 130 //minimum value of arm base motor
 #define ARM_PID_MIN_1 125 //minimum value of arm joint 1 motor
 #define ARM_TIME_LIMIT 3000 //time for arm to get into position
-#define ENCODE_SPD 120 //speed when following encoders
+#define ENCODE_SPD 190 //speed when following encoders
+#define SEARCH_SPD 90
 #define BUTTON_WAIT 200
 //states
 #define TAPE_FOLLOW_UP 0
@@ -53,7 +54,5 @@ unsigned int joint1Angle;
 unsigned int joint2Angle;
 volatile unsigned int state;
 volatile unsigned int petNum;
-volatile unsigned long leftRotations;
-volatile unsigned long rightRotations;
 bool onMarking;
 int passedMarkings;

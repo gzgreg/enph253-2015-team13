@@ -7,20 +7,14 @@
 #include <LiquidCrystal.h>
 
 int mode;
-int idx = 0;
-int leftRotations = 0;
-int rightRotations = 0;
-bool lOn = digitalRead(LEFT_ENCODER);
-bool rOn = digitalRead(RIGHT_ENCODER);
 void setup()
 {
   #include <phys253setup.txt>
-  Serial.begin(115200);
+  Serial.begin(9600);
   mode = 0;
   petNum = 1;
   leftRotations = 0;
   rightRotations = 0;
-  passedMarkings = 0;
   onMarking = false;
   
 //  enableExternalInterrupt(INT0, RISING);
@@ -28,6 +22,7 @@ void setup()
   //enableExternalInterrupt(INT2, FALLING);
   
   ARM_RELEASE.write(0);
+  moveArm(814, 646, 177); //initial arm position
   selectMode();
 }
 void loop()
@@ -40,25 +35,21 @@ void loop()
         tapeFollow();
         break;
       case PET_PICKUP: 
-        state = TAPE_FOLLOW_DOWN;
+        //petPickup(petNum);
+        petNum++;
         break;
       case IR_FOLLOW_F:
       case IR_FOLLOW_B:
         irFollow();
         break;
       case TAPE_SEARCH:
-        if(petNum == 3) tapeSearch(true, TAPE_FOLLOW_DOWN); else tapeSearch(false, TAPE_FOLLOW_DOWN);
+        tapeSearch();
         break;
       case TURN_AROUND:
-        petNum++;
-        delay(200);
-        encodedMotion(true, 4, true, 3);
-        delay(200);
-        encodedMotion(false, 9, true, 9);
-        delay(200);
-        encodedMotion(true, 2, true, 2);
-        delay(200);
-        tapeSearch(false, TAPE_FOLLOW_DOWN);
+        encodedMotion(true, 6, true, 4);
+        encodedMotion(false, 4, false, 4);
+        encodedMotion(true, 8, false, 8);
+        state = TAPE_SEARCH;
         break;
     }
   } else if(mode == 2){ //arm movement
@@ -73,9 +64,9 @@ void loop()
   } else if(mode == 4){
     state = PET_PICKUP;
     petPickup(petNum);
-    selectMode();
+    delay(1000);
   } else if(mode == 5){
-    tapeSearch(false, TAPE_FOLLOW_DOWN);
+    tapeSearch();
   } else if(mode == 6){
     switch(state){
       case TAPE_FOLLOW_UP:
@@ -90,45 +81,17 @@ void loop()
         irFollow();
         break;
       case TAPE_SEARCH:
-        tapeSearch(false, TAPE_FOLLOW_DOWN);
+        tapeSearch();
         break;
       case TURN_AROUND:
+        encodedMotion(false, 4, false, 4);
         encodedMotion(true, 16, false, 16);
         state = IR_FOLLOW_B;
         break;
     } 
   } else if(mode == 7){
-    if(digitalRead(LEFT_ENCODER) && !lOn){
-      delay(10);
-      if(digitalRead(LEFT_ENCODER)){
-        leftRotations++;
-        lOn = true;
-      }
-    } else if(!digitalRead(LEFT_ENCODER) && lOn){
-      delay(10);
-      if(!digitalRead(LEFT_ENCODER)){
-        lOn = false;
-      }
-    }
-    
-    if(digitalRead(RIGHT_ENCODER) && !rOn){
-      delay(10);
-      if(digitalRead(RIGHT_ENCODER)){
-        rightRotations++;
-        rOn = true;
-      }
-    } else if(!digitalRead(RIGHT_ENCODER) && rOn){
-      delay(10);
-      if(!digitalRead(RIGHT_ENCODER)){
-        rOn = false;
-      }
-    }
-    idx++;
-    if(idx == 100){
-      idx = 0;
-      char buffer[1024]; LCD.clear(); LCD.home(); sprintf(buffer, "%d %d", leftRotations, rightRotations); LCD.print(buffer); delay(50);
-    }
-    
+     releasePet();
+     delay(1000);
   }
   if(stopbutton()){
     delay(50);
@@ -157,6 +120,7 @@ void selectMode(){
   mode = newMode;
   if(mode == 1){
     state = TAPE_FOLLOW_UP;
+    passedMarkings = 0;
   }
   if(mode == 6){
     int newPetNum;
@@ -170,16 +134,5 @@ void selectMode(){
     petNum = newPetNum;
     state = TAPE_SEARCH;
     passedMarkings = 5;
-  }
-  if(mode == 4){
-    int newPetNum;
-    while(!stopbutton()){
-      LCD.clear(); LCD.home();
-      newPetNum = map(knob(6), 0, 1024, 1, 6);
-      LCD.print(newPetNum); 
-      delay(50);
-    }
-    while(stopbutton()){}
-    petNum = newPetNum;
   }
 }
